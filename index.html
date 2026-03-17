@@ -12,12 +12,13 @@
       width: 100%;
       margin: 0;
       padding: 0;
-      overflow: hidden; /* Prevent body scroll during gameplay */
+      overflow: hidden; /* Prevent all scrolling */
+      touch-action: none; /* Prevent touch scrolling on tablets */
     }
     
     body {
       box-sizing: border-box;
-      background-color: #0f172a; /* Fallback for slate-900 */
+      background-color: #0f172a; 
     }
     
     .font-title { font-family: 'Russo One', sans-serif; }
@@ -57,16 +58,12 @@
     .bounce-gentle { animation: bounce-gentle 2s ease-in-out infinite; }
     
     .player {
-      transition: none; /* Removed transition to avoid stutter in rAF loop */
+      transition: none; 
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
     }
     
     .item-slot {
-      transition: all 0.2s ease;
-    }
-    
-    .item-slot:hover {
-      transform: scale(1.05);
+      transition: all 0.1s ease;
     }
     
     /* 3D House Effects */
@@ -102,128 +99,119 @@
     }
   </style>
 </head>
-<body class="h-full font-body">
-  <div id="app" class="h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+<body class="h-full font-body text-slate-200">
+  <div id="app" class="h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden flex flex-col">
     <!-- Main Menu -->
-    <div id="menu-screen" class="h-full flex flex-col items-center justify-center p-4">
+    <div id="menu-screen" class="h-full hidden flex-col items-center justify-center p-4">
       <div class="text-center mb-8">
         <h1 id="title-display" class="font-title text-5xl md:text-6xl text-yellow-400 mb-2 drop-shadow-lg bounce-gentle"> DISASTERS SURVIVAL</h1>
-        <p class="text-slate-300 text-lg md:text-xl max-w-md mx-auto mb-4">Get ready for adventure! Shop for cool supplies, build your home defenses, and save the day! </p>
-        <div class="flex justify-center gap-4 text-4xl">
+        <p class="text-slate-300 text-lg max-w-md mx-auto mb-4">Get ready for adventure! Shop for cool supplies, build your home defenses, and save the day! </p>
+        <div class="flex justify-center gap-4 text-4xl mb-4">
           <span>🌪️</span> <span>🌊</span> <span>🔥</span>
         </div>
       </div>
       <div class="flex flex-col gap-4 w-full max-w-sm mx-auto text-center">
-        <p class="text-slate-400 mb-2 text-sm font-bold tracking-widest uppercase">Makey Makey Controller mode active!</p>
-        <button id="how-to-play-btn" class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-title text-2xl px-8 py-4 rounded-xl shadow-lg transform transition-all ring-4 ring-yellow-300"> HOW TO PLAY </button>
-        <button id="start-menu-btn" class="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-title text-3xl px-12 py-4 rounded-xl shadow-lg transform transition-all"> LET'S GO! </button>
+        <p class="text-cyan-300 mb-2 text-xs font-bold tracking-widest uppercase bg-slate-800 p-2 rounded-lg border border-slate-600">🎮 Makey Makey Ready</p>
+        <button id="how-to-play-btn" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-title text-2xl px-8 py-3 rounded-xl shadow-lg transform transition-all ring-4 ring-yellow-300"> HOW TO PLAY </button>
+        <button id="start-menu-btn" class="bg-gradient-to-r from-green-400 to-emerald-500 text-white font-title text-3xl px-12 py-3 rounded-xl shadow-lg transform transition-all"> LET'S GO! </button>
       </div>
     </div>
 
-    <!-- How to Play Screen -->
-    <div id="how-to-play-screen" class="h-full hidden flex-col p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-auto">
-      <button id="back-to-menu-btn" class="self-start mb-4 bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-2 rounded-lg transition-all ring-2 ring-yellow-300 shadow-lg"> [SPACE] BACK TO MENU </button>
-      <div class="max-w-2xl mx-auto w-full pb-10">
-        <h1 class="font-title text-5xl text-yellow-400 mb-6 text-center drop-shadow-lg">📖 HOW TO PLAY (MAKEY MAKEY)</h1>
-        <div class="space-y-6">
-          <p class="text-center text-slate-300 font-bold bg-slate-800 p-3 rounded-lg border-2 border-slate-600">The entire game uses ONLY the Arrow Keys ⬅️➡️⬆️⬇️ and the Spacebar!</p>
-          
-          <!-- Phase 1: Shopping -->
-          <div class="bg-blue-900/80 backdrop-blur rounded-xl p-6 border-4 border-blue-400">
-            <h2 class="font-title text-2xl text-cyan-300 mb-4 flex items-center gap-2"><span class="text-3xl">🛒</span> PHASE 1: GEAR SHOPPING</h2>
-            <div class="space-y-3 text-slate-200">
-              <p class="font-semibold">A random disaster is coming! You start with <span class="text-green-300 font-bold">$500</span>.</p>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-cyan-400">
-                <p><span class="font-bold">⬅️ ➡️ ⬆️ ⬇️</span> Move your selection</p>
-              </div>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-cyan-400">
-                <p><span class="font-bold">SPACE</span> Buy an item (or remove it if in cart)</p>
-              </div>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-cyan-400">
-                <p><span class="font-bold">⬇️ To Bottom</span> Move cursor down to checkout to start game!</p>
-              </div>
-            </div>
+    <!-- How to Play Screen (Single Page Grid) -->
+    <div id="how-to-play-screen" class="h-full hidden flex-col p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <div class="flex justify-between items-center mb-4 shrink-0">
+        <button id="back-to-menu-btn" class="bg-slate-700 text-white font-bold px-4 py-2 rounded-lg ring-2 ring-yellow-300 shadow-lg text-sm"> [SPACE] BACK </button>
+        <h1 class="font-title text-4xl text-yellow-400 drop-shadow-lg text-center flex-1">📖 HOW TO PLAY</h1>
+      </div>
+      
+      <p class="text-center text-cyan-300 font-bold bg-slate-800 p-2 rounded-lg border-2 border-slate-600 mb-4 shrink-0 text-sm">Use ONLY Arrow Keys ⬅️➡️⬆️⬇️ and Spacebar!</p>
+      
+      <div class="flex-1 grid grid-cols-3 gap-4 min-h-0">
+        <!-- Phase 1 -->
+        <div class="bg-blue-900/80 rounded-xl p-4 border-4 border-blue-400 flex flex-col min-h-0 text-sm">
+          <h2 class="font-title text-xl text-cyan-300 mb-3 flex items-center gap-2"><span class="text-2xl">🛒</span> 1. SHOP</h2>
+          <div class="space-y-3 overflow-hidden flex-1">
+            <p>A random disaster approaches! Start with <span class="text-green-300 font-bold">$500</span>.</p>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-cyan-400"><span class="font-bold text-yellow-300">⬅️➡️⬆️⬇️</span> Move cursor</div>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-cyan-400"><span class="font-bold text-yellow-300">SPACE</span> Buy or Remove</div>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-cyan-400"><span class="font-bold text-yellow-300">⬇️ Bottom</span> Go to checkout</div>
           </div>
-          
-          <!-- Phase 2: Setup -->
-          <div class="bg-purple-900/80 backdrop-blur rounded-xl p-6 border-4 border-purple-400">
-            <h2 class="font-title text-2xl text-purple-300 mb-4 flex items-center gap-2"><span class="text-3xl">🏠</span> PHASE 2: SETUP YOUR HOME</h2>
-            <div class="space-y-3 text-slate-200">
-              <p class="font-semibold">Now place your gear around the house to prepare!</p>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-purple-400">
-                <p><span class="font-bold">⬅️ ➡️ ⬆️ ⬇️</span> Walk around your home</p>
-              </div>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-purple-400">
-                <p><span class="font-bold text-yellow-300">SPACE (near a zone)</span> Place/pickup held item</p>
-              </div>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-purple-400">
-                <p><span class="font-bold text-green-300">SPACE (in empty space)</span> Cycle to the next item in your bag!</p>
-              </div>
-            </div>
+        </div>
+        
+        <!-- Phase 2 -->
+        <div class="bg-purple-900/80 rounded-xl p-4 border-4 border-purple-400 flex flex-col min-h-0 text-sm">
+          <h2 class="font-title text-xl text-purple-300 mb-3 flex items-center gap-2"><span class="text-2xl">🏠</span> 2. SETUP</h2>
+          <div class="space-y-3 overflow-hidden flex-1">
+            <p>Place gear in zones (🪟 Windows, 🚪 Door, 📦 Supplies) to protect your home!</p>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-purple-400"><span class="font-bold text-yellow-300">⬅️➡️⬆️⬇️</span> Walk around</div>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-purple-400"><span class="font-bold text-yellow-300">SPACE (near zone)</span> Place/pickup</div>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-purple-400"><span class="font-bold text-green-300">SPACE (empty area)</span> Cycle bag!</div>
           </div>
-          
-          <!-- Phase 3: Survive -->
-          <div class="bg-red-900/80 backdrop-blur rounded-xl p-6 border-4 border-red-400">
-            <h2 class="font-title text-2xl text-red-300 mb-4 flex items-center gap-2"><span class="text-3xl">🌪️</span> PHASE 3: SURVIVE THE DISASTER!</h2>
-            <div class="space-y-3 text-slate-200">
-              <p class="font-semibold">The disaster automatically strikes after a 30s prep timer!</p>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-red-400">
-                <p><span class="font-bold">🛡️ Placed items</span> Reduce damage! More protection = less damage.</p>
-              </div>
-              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-blue-400">
-                <p><span class="font-bold text-cyan-300">HOLD SPACE (1 sec)</span> Consume a healing item you are holding!</p>
-              </div>
-            </div>
+        </div>
+        
+        <!-- Phase 3 -->
+        <div class="bg-red-900/80 rounded-xl p-4 border-4 border-red-400 flex flex-col min-h-0 text-sm">
+          <h2 class="font-title text-xl text-red-300 mb-3 flex items-center gap-2"><span class="text-2xl">🌪️</span> 3. SURVIVE</h2>
+          <div class="space-y-3 overflow-hidden flex-1">
+            <p>The disaster strikes after 30s! Survive the wave.</p>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-red-400">🛡️ <span class="font-bold">Placed items</span> reduce damage.</div>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-red-400">❤️ <span class="font-bold">Health/Home at 0%</span> = Game Over.</div>
+            <div class="bg-slate-800/80 rounded p-2 border-l-4 border-blue-400"><span class="font-bold text-cyan-300">HOLD SPACE (1s)</span> Consume healing item!</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Shop Screen -->
-    <div id="shop-screen" class="h-full hidden flex-col p-4">
-      <div class="bg-blue-900/90 backdrop-blur rounded-xl p-4 mb-4 border-4 border-blue-400 shrink-0">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-          <div>
-            <h2 class="font-title text-3xl text-cyan-300">🛒 GEAR SHOP</h2>
-            <div class="bg-orange-900/60 rounded-lg mt-2 p-3 border-2 border-orange-400">
-              <p class="text-slate-200 font-bold text-lg" id="disaster-coming">🚨 TORNADO INCOMING!</p>
-              <p class="text-slate-300 text-sm mt-1" id="disaster-description">Wind barriers and storm shutters will help protect your home!</p>
-            </div>
+    <!-- Shop Screen (No Scroll Layout) -->
+    <div id="shop-screen" class="h-full hidden flex-col p-2 gap-2 bg-slate-900">
+      <!-- Top Header Bar -->
+      <div class="bg-blue-900/90 rounded-xl p-2 shrink-0 flex justify-between items-center border-2 border-blue-400 shadow-md">
+        <div class="flex items-center gap-4">
+          <h2 class="font-title text-2xl text-cyan-300 flex items-center gap-2">🛒 SHOP</h2>
+          <div class="bg-orange-900/80 px-3 py-1 rounded border border-orange-400 flex items-center gap-2">
+            <span class="font-bold text-sm text-yellow-300">INCOMING:</span>
+            <span class="font-bold text-sm text-white" id="disaster-coming">🚨 TORNADO</span>
           </div>
-          <div class="flex items-center gap-6">
-            <div class="text-center bg-green-900/50 px-4 py-2 rounded-lg border-2 border-green-400">
-              <p class="text-slate-400 text-xs font-bold">YOUR MONEY</p>
-              <p id="budget-display" class="font-title text-3xl text-green-300">$500</p>
-            </div>
-            <div class="text-center bg-orange-900/50 px-4 py-2 rounded-lg border-2 border-orange-400">
-              <p class="text-slate-400 text-xs font-bold">LEVEL</p>
-              <p id="wave-display" class="font-title text-3xl text-yellow-300">1</p>
-            </div>
+        </div>
+        <div class="flex gap-4">
+          <div class="text-center bg-green-900/80 px-3 py-1 rounded border border-green-400 min-w-[100px]">
+            <p class="text-[10px] text-slate-400 font-bold uppercase leading-tight">Money</p>
+            <p id="budget-display" class="font-title text-xl text-green-300 leading-tight">$500</p>
+          </div>
+          <div class="text-center bg-orange-900/80 px-3 py-1 rounded border border-orange-400 min-w-[70px]">
+            <p class="text-[10px] text-slate-400 font-bold uppercase leading-tight">Level</p>
+            <p id="wave-display" class="font-title text-xl text-yellow-300 leading-tight">1</p>
           </div>
         </div>
       </div>
-      <div class="flex-1 grid md:grid-cols-2 gap-4 overflow-hidden min-h-0">
-        <!-- Shop Items -->
-        <div class="bg-blue-900/80 rounded-xl p-4 border-3 border-cyan-400 flex flex-col h-full min-h-0">
-          <h3 class="font-title text-xl text-cyan-300 mb-3 shrink-0">📦 PICK YOUR GEAR</h3>
-          <p class="text-slate-300 text-xs mb-2 font-semibold shrink-0">ARROWS to move | SPACE to buy</p>
-          <div id="shop-items" class="grid grid-cols-2 gap-3 overflow-y-auto flex-1 pr-2 pb-4">
+      
+      <!-- Split View -->
+      <div class="flex-1 flex flex-row gap-2 min-h-0">
+        <!-- Shop Items (Left) -->
+        <div class="w-2/3 bg-blue-900/60 rounded-xl p-2 border-2 border-cyan-500 flex flex-col min-h-0">
+          <div class="flex justify-between items-center mb-2 shrink-0">
+             <h3 class="font-title text-lg text-cyan-300">📦 PICK YOUR GEAR</h3>
+             <p class="text-[10px] font-bold text-cyan-200">ARROWS move | SPACE buy</p>
+          </div>
+          <div id="shop-items" class="grid grid-cols-4 grid-rows-3 gap-2 flex-1 min-h-0">
             <!-- Items populated by JS -->
           </div>
         </div>
         
-        <!-- Cart -->
-        <div class="bg-green-900/80 rounded-xl p-4 border-3 border-green-400 flex flex-col h-full relative min-h-0">
-          <h3 class="font-title text-xl text-green-300 mb-3 shrink-0">🎒 MY GEAR BAG (Max 10)</h3>
-          <p class="text-slate-300 text-xs mb-2 font-semibold shrink-0">ARROWS to move | SPACE to remove | Down to checkout</p>
-          <div id="cart-items" class="grid grid-cols-3 gap-2 mb-4 overflow-y-auto flex-1 pr-2">
+        <!-- Cart (Right) -->
+        <div class="w-1/3 bg-green-900/60 rounded-xl p-2 border-2 border-green-500 flex flex-col min-h-0">
+          <div class="flex justify-between items-center mb-2 shrink-0">
+             <h3 class="font-title text-lg text-green-300">🎒 BAG <span class="text-xs text-green-200">(Max 10)</span></h3>
+          </div>
+          <p class="text-[10px] font-bold text-green-200 mb-2 shrink-0 text-center">ARROWS move | SPACE remove</p>
+          <div id="cart-items" class="grid grid-cols-2 grid-rows-5 gap-2 flex-1 min-h-0">
             <!-- Cart items populated by JS -->
           </div>
-          <div class="border-t border-green-600 pt-3 mt-auto shrink-0">
-            <div class="flex justify-between text-slate-300 mb-2 text-lg">
-              <span>Total:</span> <span id="cart-total" class="font-bold text-green-300 text-xl">$0</span>
+          <div class="mt-2 pt-2 border-t border-green-500 shrink-0 flex flex-col gap-2">
+            <div class="flex justify-between text-sm items-end">
+              <span class="font-bold">Total:</span> <span id="cart-total" class="font-title text-xl text-green-300 leading-none">$0</span>
             </div>
-            <button id="checkout-btn" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-3 rounded-lg transition-all text-lg shadow-lg"> LET'S PROTECT THE HOUSE! </button>
+            <button id="checkout-btn" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-2 rounded-lg text-sm shadow-lg transition-transform"> LET'S PROTECT THE HOUSE! </button>
           </div>
         </div>
       </div>
@@ -232,31 +220,31 @@
     <!-- Game Screen -->
     <div id="game-screen" class="h-full hidden flex-col">
       <!-- HUD -->
-      <div class="bg-slate-900/95 p-3 border-b-2 border-slate-700">
-        <div class="flex flex-wrap justify-between items-center gap-2">
+      <div class="bg-slate-900/95 p-2 border-b-2 border-slate-700 shrink-0">
+        <div class="flex justify-between items-center gap-2">
           <div class="flex items-center gap-4">
-            <div class="text-center">
-              <p class="text-slate-500 text-xs font-bold">HEALTH</p>
-              <div class="relative w-32 h-5 bg-slate-700 rounded-full overflow-hidden border border-slate-600">
-                <div id="health-bar" class="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all shadow-lg" style="width: 100%"></div>
-                <p id="health-percent" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-900">100%</p>
+            <div class="text-center w-28">
+              <p class="text-slate-400 text-[10px] font-bold uppercase leading-tight">Health</p>
+              <div class="relative w-full h-4 bg-slate-700 rounded overflow-hidden border border-slate-600">
+                <div id="health-bar" class="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all" style="width: 100%"></div>
+                <p id="health-percent" class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-900 drop-shadow-sm">100%</p>
               </div>
             </div>
-            <div class="text-center">
-              <p class="text-slate-500 text-xs font-bold">HOME STRENGTH</p>
-              <div class="relative w-32 h-5 bg-slate-700 rounded-full overflow-hidden border border-slate-600">
-                <div id="home-bar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all shadow-lg" style="width: 100%"></div>
-                <p id="home-percent" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-900">100%</p>
+            <div class="text-center w-28">
+              <p class="text-slate-400 text-[10px] font-bold uppercase leading-tight">Home</p>
+              <div class="relative w-full h-4 bg-slate-700 rounded overflow-hidden border border-slate-600">
+                <div id="home-bar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all" style="width: 100%"></div>
+                <p id="home-percent" class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-900 drop-shadow-sm">100%</p>
               </div>
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <div id="disaster-indicator" class="px-4 py-2 rounded-lg bg-orange-500/20 border-2 border-orange-500/50">
-              <span class="text-orange-400 font-bold text-lg" id="current-disaster-display">🌪️ TORNADO</span>
+            <div id="disaster-indicator" class="px-3 py-1 rounded bg-orange-500/20 border border-orange-500/50 flex items-center">
+              <span class="text-orange-400 font-bold text-sm" id="current-disaster-display">🌪️ TORNADO</span>
             </div>
-            <div class="text-center bg-yellow-900/50 px-4 py-2 rounded-lg border-2 border-yellow-400">
-              <p class="text-slate-400 text-xs font-bold">TIME LEFT</p>
-              <p id="timer-display" class="font-title text-2xl text-yellow-300">30</p>
+            <div class="text-center bg-yellow-900/50 px-3 py-1 rounded border border-yellow-400 w-16">
+              <p class="text-[10px] text-slate-400 font-bold uppercase leading-tight">Time</p>
+              <p id="timer-display" class="font-title text-lg text-yellow-300 leading-tight">30</p>
             </div>
           </div>
         </div>
@@ -264,8 +252,8 @@
 
       <!-- Game Area -->
       <div class="flex-1 relative overflow-hidden bg-gradient-to-b from-slate-700 to-slate-900" id="game-area">
-        <div id="house" class="absolute inset-4 md:inset-8 house-3d rounded-xl overflow-hidden border-4 border-amber-900">
-          <!-- Room grid background with 3D effect -->
+        <div id="house" class="absolute inset-4 house-3d rounded-xl overflow-hidden border-4 border-amber-900">
+          <!-- Room grid background -->
           <div class="absolute inset-0 grid grid-cols-4 grid-rows-3 opacity-15">
             <div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div>
             <div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div>
@@ -275,25 +263,25 @@
           <!-- Placement zones -->
           <div id="placement-zones" class="absolute inset-0">
             <!-- Windows -->
-            <div class="placement-zone zone-window absolute top-0 left-1/4 w-20 h-12 border-3 border-dashed border-cyan-500 rounded-lg flex flex-col items-center justify-center text-xs text-cyan-300 font-bold transition-all transform" data-zone="window-1" title="Window protection zone">
-              <div class="text-2xl">🪟</div><div class="text-xs mt-1">Window</div>
+            <div class="placement-zone zone-window absolute top-0 left-1/4 w-16 h-10 border-2 border-dashed border-cyan-500 rounded flex flex-col items-center justify-center text-[10px] text-cyan-300 font-bold" data-zone="window-1">
+              <div class="text-xl leading-none">🪟</div>
             </div>
-            <div class="placement-zone zone-window absolute top-0 right-1/4 w-20 h-12 border-3 border-dashed border-cyan-500 rounded-lg flex flex-col items-center justify-center text-xs text-cyan-300 font-bold transition-all transform" data-zone="window-2" title="Window protection zone">
-              <div class="text-2xl">🪟</div><div class="text-xs mt-1">Window</div>
+            <div class="placement-zone zone-window absolute top-0 right-1/4 w-16 h-10 border-2 border-dashed border-cyan-500 rounded flex flex-col items-center justify-center text-[10px] text-cyan-300 font-bold" data-zone="window-2">
+              <div class="text-xl leading-none">🪟</div>
             </div>
-            <div class="placement-zone zone-window absolute bottom-0 left-1/3 w-20 h-12 border-3 border-dashed border-cyan-500 rounded-lg flex flex-col items-center justify-center text-xs text-cyan-300 font-bold transition-all transform" data-zone="window-3" title="Window protection zone">
-              <div class="text-2xl">🪟</div><div class="text-xs mt-1">Window</div>
+            <div class="placement-zone zone-window absolute bottom-0 left-1/3 w-16 h-10 border-2 border-dashed border-cyan-500 rounded flex flex-col items-center justify-center text-[10px] text-cyan-300 font-bold" data-zone="window-3">
+              <div class="text-xl leading-none">🪟</div>
             </div>
             <!-- Door -->
-            <div class="placement-zone zone-door absolute right-0 top-1/2 -translate-y-1/2 w-12 h-20 border-3 border-dashed border-amber-600 rounded-lg flex flex-col items-center justify-center text-xs text-amber-300 font-bold transition-all transform" data-zone="door" title="Door protection zone">
-              <div class="text-2xl">🚪</div><div class="text-xs mt-1">Door</div>
+            <div class="placement-zone zone-door absolute right-0 top-1/2 -translate-y-1/2 w-10 h-16 border-2 border-dashed border-amber-600 rounded flex flex-col items-center justify-center text-[10px] text-amber-300 font-bold" data-zone="door">
+              <div class="text-xl leading-none">🚪</div>
             </div>
             <!-- Supply areas -->
-            <div class="placement-zone zone-supplies absolute bottom-3 left-3 w-24 h-24 border-3 border-dashed border-purple-500 rounded-lg flex flex-col items-center justify-center text-xs text-purple-300 font-bold transition-all transform" data-zone="supplies-1" title="Supply storage area">
-              <div class="text-2xl">📦</div><div class="text-xs mt-1">Supplies</div>
+            <div class="placement-zone zone-supplies absolute bottom-2 left-2 w-20 h-20 border-2 border-dashed border-purple-500 rounded flex flex-col items-center justify-center text-[10px] text-purple-300 font-bold" data-zone="supplies-1">
+              <div class="text-2xl leading-none mb-1">📦</div>Supplies
             </div>
-            <div class="placement-zone zone-supplies absolute top-3 right-3 w-24 h-24 border-3 border-dashed border-purple-500 rounded-lg flex flex-col items-center justify-center text-xs text-purple-300 font-bold transition-all transform" data-zone="supplies-2" title="Supply storage area">
-              <div class="text-2xl">📦</div><div class="text-xs mt-1">Supplies</div>
+            <div class="placement-zone zone-supplies absolute top-2 right-2 w-20 h-20 border-2 border-dashed border-purple-500 rounded flex flex-col items-center justify-center text-[10px] text-purple-300 font-bold" data-zone="supplies-2">
+              <div class="text-2xl leading-none mb-1">📦</div>Supplies
             </div>
           </div>
           
@@ -301,7 +289,7 @@
           <div id="placed-items" class="absolute inset-0 pointer-events-none"></div>
           
           <!-- Player -->
-          <div id="player" class="player absolute w-12 h-12 bg-gradient-to-b from-yellow-300 to-orange-500 rounded-full border-3 border-white shadow-xl flex items-center justify-center text-2xl z-20" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
+          <div id="player" class="player absolute w-10 h-10 bg-gradient-to-b from-yellow-300 to-orange-500 rounded-full border-2 border-white shadow-xl flex items-center justify-center text-xl z-20" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
             🏃
           </div>
         </div>
@@ -310,47 +298,42 @@
         <div id="disaster-overlay" class="absolute inset-0 pointer-events-none z-30 hidden"></div>
         
         <!-- Action bar -->
-        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur rounded-xl p-3 border-2 border-slate-600 z-40 shadow-xl flex items-center justify-between gap-4 w-[90%] md:w-auto">
+        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 bg-slate-900/95 rounded-xl p-2 border-2 border-slate-600 z-40 shadow-xl flex items-center justify-between gap-3 min-w-[300px]">
           <div class="flex items-center gap-2 shrink-0">
-            <span class="text-slate-300 text-[10px] md:text-xs font-bold hidden md:inline">HOLDING:</span>
-            <div id="holding-item" class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg border-2 border-slate-500 flex items-center justify-center text-2xl shadow-md">
+            <span class="text-slate-400 text-[9px] font-bold uppercase">Hold:</span>
+            <div id="holding-item" class="w-10 h-10 bg-slate-800 rounded border border-slate-500 flex items-center justify-center text-xl shadow-inner">
               -
             </div>
-            <span id="holding-name" class="text-slate-200 text-xs md:text-sm font-semibold min-w-[60px] md:min-w-[90px]">Nothing</span>
+            <span id="holding-name" class="text-slate-200 text-xs font-bold w-16 truncate">Nothing</span>
           </div>
-          <div class="flex flex-col text-slate-300 text-[10px] md:text-xs font-bold border-l-2 border-slate-600 pl-4 w-full text-center md:text-left leading-tight">
-            <p class="mb-1">🎮 <span class="text-cyan-300">ARROWS</span>: Walk &nbsp;|&nbsp; <span class="text-green-300">SPACE (near zone)</span>: Place/Pick</p>
-            <p>🔄 <span class="text-yellow-300">SPACE (empty area)</span>: Cycle Bag &nbsp;|&nbsp; ❤️ <span class="text-red-300">HOLD SPACE (1s)</span>: Heal</p>
+          <div class="flex flex-col text-slate-300 text-[9px] font-bold border-l border-slate-600 pl-3 leading-tight">
+            <p>🎮 <span class="text-cyan-300">ARROWS</span>: Walk | <span class="text-green-300">SPACE (near zone)</span>: Place/Pick</p>
+            <p>🔄 <span class="text-yellow-300">SPACE (empty)</span>: Cycle Bag | ❤️ <span class="text-red-300">HOLD SPACE</span>: Heal</p>
           </div>
         </div>
       </div>
 
-      <!-- Inventory Panel Bottom Bar -->
-      <div class="bg-slate-900/95 p-3 border-t-2 border-slate-700">
-        <div class="flex items-center gap-4 overflow-x-auto pb-1">
-          <span class="text-slate-300 text-sm font-bold whitespace-nowrap hidden md:inline">QUICK SLOTS:</span>
-          <div id="inventory-slots" class="flex gap-2">
-            <!-- Inventory populated by JS -->
-          </div>
+      <!-- Inventory Bar -->
+      <div class="bg-slate-900/95 p-2 border-t-2 border-slate-700 shrink-0 h-16 flex items-center justify-center">
+        <div id="inventory-slots" class="flex gap-1 h-full">
+          <!-- Inventory populated by JS -->
         </div>
       </div>
     </div>
 
     <!-- Results Screen -->
     <div id="results-screen" class="h-full hidden flex-col items-center justify-center p-4">
-      <div id="results-content" class="bg-slate-800/95 backdrop-blur rounded-2xl p-8 border-4 border-slate-600 text-center max-w-md shadow-2xl">
+      <div id="results-content" class="bg-slate-800/95 rounded-2xl p-6 border-4 border-slate-600 text-center w-full max-w-sm shadow-2xl">
         <!-- Results populated by JS -->
       </div>
     </div>
   </div>
 
   <script>
-    // State variables
     let shopMode = 'items'; // 'items', 'cart', or 'checkout'
-    let menuFocusIndex = 0; // 0 = HOW TO PLAY, 1 = START
-    let resultsFocusIndex = 0; // 0 = Action button, 1 = Home button
+    let menuFocusIndex = 0; 
+    let resultsFocusIndex = 0; 
     
-    // Game State
     let gameState = {
       screen: 'menu',
       money: 500,
@@ -371,7 +354,6 @@
       selectedSlot: null
     };
     
-    // Items Database 
     const items = {
       waterJugs: { name: "Water Bottles", icon: "💧", price: 30, protection: { all: 10 }, health: 5, zone: "supplies" },
       foodKit: { name: "Snack Pack", icon: "🥫", price: 35, protection: { all: 8 }, health: 5, zone: "supplies" },
@@ -387,16 +369,14 @@
       rope: { name: "Rope & Straps", icon: "🪢", price: 35, protection: { earthquake: 30 }, zone: "safe-zone" }
     };
     
-    // Disasters Database
     const disasters = [
-      { id: "tornado", name: "🌪️ TORNADO", description: "Strong winds are coming! Use window shields and sand barriers to protect your home from flying debris!" },
-      { id: "flood", name: "🌊 FLOOD", description: "Heavy rain and water are coming! Sand barriers and elevated supplies will help keep water out!" },
-      { id: "earthquake", name: "💥 EARTHQUAKE", description: "The ground will shake! Safety helmets and secured furniture help protect you inside!" },
-      { id: "hurricane", name: "🌀 HURRICANE", description: "Powerful winds and rain are headed your way! Strong window shields and barriers will help!" },
-      { id: "fire", name: "🔥 WILDFIRE", description: "Fire is spreading! Fire extinguishers and safe shelter are critical!" }
+      { id: "tornado", name: "🌪️ TORNADO", description: "Use window shields and sand barriers to protect your home!" },
+      { id: "flood", name: "🌊 FLOOD", description: "Sand barriers and elevated supplies will keep water out!" },
+      { id: "earthquake", name: "💥 EARTHQUAKE", description: "Safety helmets and ropes help protect you inside!" },
+      { id: "hurricane", name: "🌀 HURRICANE", description: "Combine window shields and sand barriers against the storm!" },
+      { id: "fire", name: "🔥 WILDFIRE", description: "Fire extinguishers and safe shelter are critical!" }
     ];
     
-    // UI Helpers
     function showScreen(screenId) {
       document.querySelectorAll('#app > div').forEach(s => s.classList.add('hidden'));
       document.querySelectorAll('#app > div').forEach(s => s.classList.remove('flex'));
@@ -406,7 +386,6 @@
       gameState.screen = screenId;
     }
     
-    // Core Functions
     function startGame() {
       gameState = {
         ...gameState,
@@ -430,10 +409,15 @@
     }
     
     function updateShop() {
-      document.getElementById('budget-display').textContent = `$${gameState.money}`;
-      document.getElementById('wave-display').textContent = gameState.wave;
-      document.getElementById('disaster-coming').innerHTML = gameState.currentDisaster.name;
-      document.getElementById('disaster-description').textContent = gameState.currentDisaster.description;
+      const budgetDisplay = document.getElementById('budget-display');
+      const waveDisplay = document.getElementById('wave-display');
+      const disasterComing = document.getElementById('disaster-coming');
+      const disasterDesc = document.getElementById('disaster-description');
+      
+      if (budgetDisplay) budgetDisplay.textContent = `$${gameState.money}`;
+      if (waveDisplay) waveDisplay.textContent = gameState.wave;
+      if (disasterComing) disasterComing.innerHTML = gameState.currentDisaster.name;
+      if (disasterDesc) disasterDesc.textContent = gameState.currentDisaster.description;
       
       const shopContainer = document.getElementById('shop-items');
       shopContainer.innerHTML = '';
@@ -442,21 +426,12 @@
         const canAfford = item.price <= gameState.money;
         const isSelected = gameState.shopSelectedIndex === index;
         const div = document.createElement('div');
-        div.className = `item-slot p-4 rounded-lg border-2 transition-all cursor-pointer ${isSelected && shopMode === 'items' ? 'border-yellow-300 bg-slate-600 ring-4 ring-yellow-300 scale-105 shadow-xl' : (canAfford ? 'bg-slate-700 border-slate-600 hover:border-cyan-400' : 'bg-slate-800 border-slate-700 opacity-50')}`;
+        div.className = `item-slot p-1 flex flex-col items-center justify-center rounded-lg border-2 bg-slate-800/80 ${isSelected && shopMode === 'items' ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 shadow-xl z-10' : (canAfford ? 'border-slate-600' : 'border-slate-700 opacity-40')}`;
         div.innerHTML = `
-          <div class="text-3xl text-center mb-2">${item.icon}</div>
-          <p class="text-sm text-slate-300 text-center font-semibold truncate">${item.name}</p>
-          <p class="text-center font-bold mt-1 ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
+          <div class="text-2xl leading-none mb-1">${item.icon}</div>
+          <p class="text-[9px] text-slate-300 text-center font-bold leading-tight px-1 line-clamp-2 w-full">${item.name}</p>
+          <p class="text-[10px] font-bold mt-auto ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
         `;
-        div.onclick = () => {
-          gameState.shopSelectedIndex = index;
-          shopMode = 'items';
-          addToCart(id);
-        };
-        // Scroll into view if selected
-        if (isSelected && shopMode === 'items') {
-            setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0);
-        }
         shopContainer.appendChild(div);
       });
       
@@ -489,9 +464,7 @@
         if (gameState.cartSelectedIndex >= gameState.cart.length) {
           gameState.cartSelectedIndex = Math.max(0, gameState.cart.length - 1);
         }
-        if (gameState.cart.length === 0) {
-           shopMode = 'items';
-        }
+        if (gameState.cart.length === 0) shopMode = 'items';
         updateShop();
       }
     }
@@ -505,31 +478,19 @@
         total += item.price;
         const isSelected = gameState.cartSelectedIndex === index && shopMode === 'cart';
         const div = document.createElement('div');
-        div.className = `bg-gradient-to-br p-2 rounded-lg text-center cursor-pointer transition-all border shadow-md ${isSelected ? 'from-yellow-500 to-yellow-600 border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'from-slate-600 to-slate-700 border-slate-500 hover:border-red-400'}`;
+        div.className = `bg-slate-700 flex flex-col items-center justify-center rounded border shadow-inner ${isSelected ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'border-slate-500'}`;
         div.innerHTML = `
-          <div class="text-2xl">${item.icon}</div>
-          <p class="text-[10px] md:text-xs text-slate-300 truncate font-semibold">${item.name}</p>
+          <div class="text-xl leading-none">${item.icon}</div>
+          <div class="text-[8px] truncate w-full text-center px-1 font-bold text-slate-300">${item.name}</div>
         `;
-        div.onclick = () => {
-          gameState.cartSelectedIndex = index;
-          shopMode = 'cart';
-          removeFromCart();
-        };
-        if (isSelected && shopMode === 'cart') {
-            setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0);
-        }
         cartContainer.appendChild(div);
       });
       
-      // Pad empty slots up to 10
       for(let i = gameState.cart.length; i < 10; i++) {
         const isSelected = gameState.cartSelectedIndex === i && shopMode === 'cart';
         const div = document.createElement('div');
-        div.className = `bg-slate-800/50 p-2 rounded-lg text-center border transition-all ${isSelected ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'border-slate-600 border-dashed opacity-50'}`;
-        div.innerHTML = `<div class="text-2xl invisible">-</div>`;
-        if (isSelected && shopMode === 'cart') {
-            setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0);
-        }
+        div.className = `bg-slate-800/50 rounded border flex items-center justify-center ${isSelected ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'border-slate-600 border-dashed opacity-50'}`;
+        div.innerHTML = `<div class="text-xl invisible">-</div>`;
         cartContainer.appendChild(div);
       }
       
@@ -538,7 +499,7 @@
     
     function checkout() {
       gameState.inventory = [...gameState.cart];
-      while(gameState.inventory.length < 10) gameState.inventory.push(null); // pad empty slots
+      while(gameState.inventory.length < 10) gameState.inventory.push(null); 
       
       gameState.cart = [];
       gameState.cartSelectedIndex = -1;
@@ -555,10 +516,10 @@
       updateInventoryDisplay();
       updatePlacedItems();
       
-      document.getElementById('disaster-indicator').className = 'px-4 py-2 rounded-lg bg-yellow-500/20 border-2 border-yellow-500 text-lg font-bold pulse-glow';
+      document.getElementById('disaster-indicator').className = 'px-3 py-1 rounded bg-yellow-500/20 border border-yellow-500 flex items-center';
+      document.getElementById('current-disaster-display').className = 'text-yellow-400 font-bold text-sm pulse-glow';
       document.getElementById('current-disaster-display').textContent = '⚠️ PREP PHASE';
       
-      // Auto Start Timer setup
       let prepTime = 30;
       document.getElementById('timer-display').textContent = prepTime + 's';
       if (gameState.gameInterval) clearInterval(gameState.gameInterval);
@@ -575,7 +536,8 @@
     
     function startDisaster() {
       gameState.disasterActive = true;
-      document.getElementById('disaster-indicator').className = 'px-4 py-2 rounded-lg bg-red-500/30 border-2 border-red-500 pulse-glow text-lg font-bold';
+      document.getElementById('disaster-indicator').className = 'px-3 py-1 rounded bg-red-500/30 border border-red-500 flex items-center';
+      document.getElementById('current-disaster-display').className = 'text-red-400 font-bold text-sm pulse-glow';
       document.getElementById('current-disaster-display').textContent = gameState.currentDisaster.name + ' HERE!';
       
       const overlay = document.getElementById('disaster-overlay');
@@ -583,9 +545,7 @@
       overlay.innerHTML = getDisasterEffects();
       
       const house = document.getElementById('house');
-      if (['earthquake', 'tornado'].includes(gameState.currentDisaster.id)) {
-        house.classList.add('shake');
-      }
+      if (['earthquake', 'tornado'].includes(gameState.currentDisaster.id)) house.classList.add('shake');
       
       let disasterTime = Math.round((15 + (gameState.wave * 2)) * Math.pow(1.1, gameState.wave - 1));
       document.getElementById('timer-display').textContent = disasterTime;
@@ -658,47 +618,47 @@
       const earnings = survived ? 100 + (gameState.wave * 10) : 0;
       const content = document.getElementById('results-content');
       
-      resultsFocusIndex = 0; // Default to the top action button
+      resultsFocusIndex = 0; 
       
       if (survived) {
         content.innerHTML = `
-          <div class="text-8xl mb-4 bounce-gentle">🏆</div>
-          <h2 class="font-title text-4xl text-green-400 mb-2">AWESOME! YOU SURVIVED!</h2>
-          <p class="text-slate-300 mb-6 text-lg font-semibold">Level ${gameState.wave} Complete!</p>
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-green-900/60 rounded-lg p-4 border-2 border-green-400">
-              <p class="text-slate-300 text-xs font-bold">YOUR HEALTH</p>
-              <p class="font-title text-3xl text-green-400">${Math.round(gameState.health)}%</p>
+          <div class="text-6xl mb-2 bounce-gentle">🏆</div>
+          <h2 class="font-title text-3xl text-green-400 mb-1">YOU SURVIVED!</h2>
+          <p class="text-slate-300 mb-4 text-sm font-bold">Level ${gameState.wave} Complete!</p>
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            <div class="bg-green-900/60 rounded p-2 border border-green-400">
+              <p class="text-slate-300 text-[10px] uppercase font-bold">HEALTH</p>
+              <p class="font-title text-2xl text-green-400 leading-none">${Math.round(gameState.health)}%</p>
             </div>
-            <div class="bg-blue-900/60 rounded-lg p-4 border-2 border-blue-400">
-              <p class="text-slate-300 text-xs font-bold">HOUSE SAFETY</p>
-              <p class="font-title text-3xl text-blue-400">${Math.round(gameState.homeIntegrity)}%</p>
+            <div class="bg-blue-900/60 rounded p-2 border border-blue-400">
+              <p class="text-slate-300 text-[10px] uppercase font-bold">HOME</p>
+              <p class="font-title text-2xl text-blue-400 leading-none">${Math.round(gameState.homeIntegrity)}%</p>
             </div>
           </div>
-          <div class="bg-yellow-900/60 rounded-lg p-4 mb-6 border-3 border-yellow-400">
-            <p class="text-slate-300 text-xs font-bold">MONEY EARNED</p>
-            <p class="font-title text-4xl text-yellow-300">+$${earnings}</p>
+          <div class="bg-yellow-900/60 rounded p-2 mb-4 border border-yellow-400">
+            <p class="text-slate-300 text-[10px] uppercase font-bold">EARNED</p>
+            <p class="font-title text-3xl text-yellow-300 leading-none">+$${earnings}</p>
           </div>
-          <button id="results-action-btn" onclick="nextWave(${earnings})" class="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 rounded-lg transition-all mb-3 text-xl shadow-lg ring-4 ring-yellow-300 scale-105"> NEXT LEVEL </button>
-          <button id="results-home-btn" onclick="showScreen('menu-screen')" class="w-full bg-slate-600 hover:bg-slate-700 text-slate-100 font-bold py-2 rounded-lg transition-all"> Back Home </button>
+          <button id="results-action-btn" onclick="nextWave(${earnings})" class="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold py-3 rounded-lg mb-2 text-lg shadow ring-4 ring-yellow-300"> NEXT LEVEL </button>
+          <button id="results-home-btn" onclick="showScreen('menu-screen')" class="w-full bg-slate-700 text-slate-100 font-bold py-2 rounded-lg text-sm"> Menu </button>
         `;
       } else {
         content.innerHTML = `
-          <div class="text-8xl mb-4">💀</div>
-          <h2 class="font-title text-4xl text-orange-400 mb-2">OOPS! YOU FAILED!</h2>
-          <p class="text-slate-300 mb-6 text-lg font-semibold">You made it to Level ${gameState.wave}</p>
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-orange-900/60 rounded-lg p-4 border-2 border-orange-400">
-              <p class="text-slate-300 text-xs font-bold">FINAL HEALTH</p>
-              <p class="font-title text-3xl text-orange-400">${Math.round(gameState.health)}%</p>
+          <div class="text-6xl mb-2">💀</div>
+          <h2 class="font-title text-3xl text-orange-400 mb-1">YOU FAILED!</h2>
+          <p class="text-slate-300 mb-4 text-sm font-bold">Made it to Level ${gameState.wave}</p>
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            <div class="bg-orange-900/60 rounded p-2 border border-orange-400">
+              <p class="text-slate-300 text-[10px] uppercase font-bold">HEALTH</p>
+              <p class="font-title text-2xl text-orange-400 leading-none">${Math.round(gameState.health)}%</p>
             </div>
-            <div class="bg-red-900/60 rounded-lg p-4 border-2 border-red-400">
-              <p class="text-slate-300 text-xs font-bold">HOUSE DAMAGE</p>
-              <p class="font-title text-3xl text-red-400">${Math.round(gameState.homeIntegrity)}%</p>
+            <div class="bg-red-900/60 rounded p-2 border border-red-400">
+              <p class="text-slate-300 text-[10px] uppercase font-bold">HOME</p>
+              <p class="font-title text-2xl text-red-400 leading-none">${Math.round(gameState.homeIntegrity)}%</p>
             </div>
           </div>
-          <button id="results-action-btn" onclick="startGame()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold py-4 rounded-lg transition-all mb-3 text-xl shadow-lg ring-4 ring-yellow-300 scale-105"> TRY AGAIN </button>
-          <button id="results-home-btn" onclick="showScreen('menu-screen')" class="w-full bg-slate-600 hover:bg-slate-700 text-slate-100 font-bold py-2 rounded-lg transition-all"> Back Home </button>
+          <button id="results-action-btn" onclick="startGame()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-3 rounded-lg mb-2 text-lg shadow ring-4 ring-yellow-300"> TRY AGAIN </button>
+          <button id="results-home-btn" onclick="showScreen('menu-screen')" class="w-full bg-slate-700 text-slate-100 font-bold py-2 rounded-lg text-sm"> Menu </button>
         `;
       }
       showScreen('results-screen');
@@ -731,7 +691,7 @@
         holdingDisplay.textContent = gameState.holdingItem.icon;
         holdingName.textContent = gameState.holdingItem.name;
       } else {
-        holdingDisplay.textContent = '🚫';
+        holdingDisplay.textContent = '-';
         holdingName.textContent = 'Nothing';
       }
       updatePlayerPosition();
@@ -744,25 +704,19 @@
       for (let i = 0; i < 10; i++) {
         const item = gameState.inventory[i];
         const div = document.createElement('div');
-        div.className = `relative min-w-[3.5rem] h-14 md:w-16 md:h-16 rounded-lg border-2 flex flex-col items-center justify-center cursor-pointer transition-all shadow-md ${
-          gameState.selectedSlot === i ? 'border-yellow-300 bg-gradient-to-br from-yellow-600 to-yellow-700 hover:from-yellow-500' :
-          (item ? 'border-slate-500 bg-gradient-to-br from-slate-600 to-slate-700 hover:border-yellow-400' : 'border-slate-500 bg-slate-800/50 hover:bg-slate-700/50 hover:border-yellow-400')
+        div.className = `h-full flex-1 rounded border-2 flex items-center justify-center ${
+          gameState.selectedSlot === i ? 'border-yellow-300 bg-gradient-to-br from-yellow-600 to-yellow-700' :
+          (item ? 'border-slate-500 bg-slate-700' : 'border-slate-600 bg-slate-800/50')
         }`;
         
-        div.innerHTML = `
-          <div class="text-xl md:text-2xl">${item ? item.icon : ' '}</div>
-          <div class="text-[10px] md:text-xs font-bold text-yellow-300 absolute bottom-1 right-1.5">${i === 9 ? 0 : i+1}</div>
-        `;
-        div.onclick = () => { /* Mouse fallback to simulate cycle */ cycleInventoryTo(i); };
+        div.innerHTML = `<div class="text-xl md:text-2xl">${item ? item.icon : ' '}</div>`;
         container.appendChild(div);
       }
     }
     
     function cycleInventory() {
-      // Find the next available item starting from current slot
       let startIndex = gameState.selectedSlot === null ? 0 : (gameState.selectedSlot + 1) % 10;
       let foundIndex = -1;
-      
       for (let i = 0; i < 10; i++) {
           let checkIndex = (startIndex + i) % 10;
           if (gameState.inventory[checkIndex] !== null || (gameState.holdingItem && gameState.selectedSlot === checkIndex)) {
@@ -770,7 +724,6 @@
               break;
           }
       }
-      
       if (foundIndex !== -1 && foundIndex !== gameState.selectedSlot) {
           cycleInventoryTo(foundIndex);
       }
@@ -778,33 +731,26 @@
 
     function cycleInventoryTo(index) {
       if (!gameState.inventory[index] && !gameState.holdingItem) return;
-      
-      // Swap whatever we are holding with the new slot
       if (gameState.holdingItem && gameState.selectedSlot !== null) {
           gameState.inventory[gameState.selectedSlot] = gameState.holdingItem;
       }
-      
       gameState.selectedSlot = index;
       gameState.holdingItem = gameState.inventory[index];
       gameState.inventory[index] = null;
-      
       updateInventoryDisplay();
       updateGameUI();
     }
     
     function useHeldItem() {
       if (!gameState.holdingItem) return;
-      
       const item = gameState.holdingItem;
-      const consumables = ['waterJugs', 'foodKit', 'firstAid'];
-      if (consumables.includes(item.id)) {
+      if (['waterJugs', 'foodKit', 'firstAid'].includes(item.id)) {
         gameState.health = Math.min(100, gameState.health + item.health);
         gameState.holdingItem = null;
         updateInventoryDisplay();
         updateGameUI();
         showConsumptionFeedback(item);
       } else {
-        // Visual shake feedback for non-consumable items
         const player = document.getElementById('player');
         player.classList.add('shake');
         setTimeout(() => player.classList.remove('shake'), 400);
@@ -813,10 +759,10 @@
     
     function showConsumptionFeedback(item) {
       const feedback = document.createElement('div');
-      feedback.className = 'fixed top-1/4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-4 rounded-lg font-bold text-xl shadow-xl animate-bounce z-50';
-      feedback.textContent = `${item.icon} ${item.name} used! +${item.health} HP`;
+      feedback.className = 'fixed top-1/4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-2 rounded-lg font-bold text-lg shadow-xl animate-bounce z-50';
+      feedback.textContent = `${item.icon} +${item.health} HP`;
       document.body.appendChild(feedback);
-      setTimeout(() => feedback.remove(), 2000);
+      setTimeout(() => feedback.remove(), 1500);
     }
     
     function updatePlacedItems() {
@@ -828,15 +774,13 @@
         if (zoneEl) {
           const rect = zoneEl.getBoundingClientRect();
           const houseRect = document.getElementById('house').getBoundingClientRect();
-          
           const div = document.createElement('div');
-          div.className = 'placed-item-badge absolute flex flex-col items-center justify-center rounded-lg font-bold text-xs pointer-events-auto';
+          div.className = 'placed-item-badge absolute flex flex-col items-center justify-center rounded font-bold text-xs pointer-events-auto';
           div.style.left = `${((rect.left - houseRect.left) / houseRect.width) * 100}%`;
           div.style.top = `${((rect.top - houseRect.top) / houseRect.height) * 100}%`;
           div.style.width = `${(rect.width / houseRect.width) * 100}%`;
           div.style.height = `${(rect.height / houseRect.height) * 100}%`;
-          div.innerHTML = `<div class="text-3xl">${item.icon}</div><div class="text-slate-800 mt-1 text-center hidden md:block">${item.name}</div>`;
-          div.title = item.name;
+          div.innerHTML = `<div class="text-2xl">${item.icon}</div>`;
           container.appendChild(div);
         }
       });
@@ -847,7 +791,7 @@
 
       const zones = document.querySelectorAll('.placement-zone');
       let nearestZone = null;
-      let minDist = 20; // 20% distance threshold
+      let minDist = 18; 
       
       zones.forEach(zone => {
         const rect = zone.getBoundingClientRect();
@@ -855,57 +799,41 @@
         const zoneX = ((rect.left - houseRect.left + rect.width / 2) / houseRect.width) * 100;
         const zoneY = ((rect.top - houseRect.top + rect.height / 2) / houseRect.height) * 100;
         const dist = Math.sqrt(Math.pow(gameState.playerPos.x - zoneX, 2) + Math.pow(gameState.playerPos.y - zoneY, 2));
-        
-        if (dist < minDist) {
-          minDist = dist;
-          nearestZone = zone.dataset.zone;
-        }
+        if (dist < minDist) { minDist = dist; nearestZone = zone.dataset.zone; }
       });
       
       if (nearestZone) {
-        // We are near a zone. Try placing or picking up.
         if (gameState.holdingItem) {
-          // Swap if there is already an item here
           let toInventory = null;
-          if (gameState.placedItems[nearestZone]) {
-            toInventory = gameState.placedItems[nearestZone];
-          }
+          if (gameState.placedItems[nearestZone]) toInventory = gameState.placedItems[nearestZone];
           gameState.placedItems[nearestZone] = gameState.holdingItem;
           
           if (toInventory) {
              const emptySlot = gameState.inventory.findIndex(s => s === null);
              if (emptySlot !== -1) gameState.inventory[emptySlot] = toInventory;
-             else gameState.holdingItem = toInventory; // keep holding old item if bag full
+             else gameState.holdingItem = toInventory; 
           } else {
              gameState.holdingItem = null;
           }
-          
           updatePlacedItems();
           updateInventoryDisplay();
           updateGameUI();
         } else if (gameState.placedItems[nearestZone]) {
-          // Pick up placed item
           gameState.holdingItem = gameState.placedItems[nearestZone];
           delete gameState.placedItems[nearestZone];
           updatePlacedItems();
           updateGameUI();
         }
       } else {
-        // Not near any zone, cycle inventory
         cycleInventory();
       }
     }
     
     function updateMenuFocus() {
-      const howToPlayBtn = document.getElementById('how-to-play-btn');
-      const startBtn = document.getElementById('start-menu-btn');
-      if (menuFocusIndex === 0) {
-        howToPlayBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-110');
-        startBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-110');
-      } else {
-        howToPlayBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-110');
-        startBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-110');
-      }
+      const hBtn = document.getElementById('how-to-play-btn');
+      const sBtn = document.getElementById('start-menu-btn');
+      if (menuFocusIndex === 0) { hBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105'); sBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105'); } 
+      else { hBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105'); sBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105'); }
     }
     
     function updateShopFocus() {
@@ -913,17 +841,20 @@
       const cartItems = document.querySelectorAll('#cart-items > div');
       const checkoutBtn = document.getElementById('checkout-btn');
       
-      shopItems.forEach((item, idx) => item.classList.toggle('ring-4', idx === gameState.shopSelectedIndex && shopMode === 'items'));
-      shopItems.forEach((item, idx) => item.classList.toggle('scale-105', idx === gameState.shopSelectedIndex && shopMode === 'items'));
-      
-      cartItems.forEach((item, idx) => item.classList.toggle('ring-4', idx === gameState.cartSelectedIndex && shopMode === 'cart'));
-      cartItems.forEach((item, idx) => item.classList.toggle('scale-105', idx === gameState.cartSelectedIndex && shopMode === 'cart'));
-
-      if (shopMode === 'checkout') {
-          checkoutBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105');
-      } else {
-          checkoutBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
-      }
+      shopItems.forEach((item, idx) => {
+          item.classList.toggle('ring-4', idx === gameState.shopSelectedIndex && shopMode === 'items');
+          item.classList.toggle('scale-105', idx === gameState.shopSelectedIndex && shopMode === 'items');
+          item.classList.toggle('border-yellow-300', idx === gameState.shopSelectedIndex && shopMode === 'items');
+          item.classList.toggle('z-10', idx === gameState.shopSelectedIndex && shopMode === 'items');
+      });
+      cartItems.forEach((item, idx) => {
+          item.classList.toggle('ring-4', idx === gameState.cartSelectedIndex && shopMode === 'cart');
+          item.classList.toggle('scale-105', idx === gameState.cartSelectedIndex && shopMode === 'cart');
+          item.classList.toggle('border-yellow-300', idx === gameState.cartSelectedIndex && shopMode === 'cart');
+          item.classList.toggle('z-10', idx === gameState.cartSelectedIndex && shopMode === 'cart');
+      });
+      checkoutBtn.classList.toggle('ring-4', shopMode === 'checkout');
+      checkoutBtn.classList.toggle('scale-[1.02]', shopMode === 'checkout');
     }
 
     function updateResultsFocus() {
@@ -932,11 +863,11 @@
         if (!actionBtn || !homeBtn) return;
         
         if (resultsFocusIndex === 0) {
-            actionBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105');
-            homeBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
+            actionBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-[1.02]');
+            homeBtn.classList.remove('ring-2', 'ring-white', 'scale-[1.02]');
         } else {
-            homeBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105');
-            actionBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
+            homeBtn.classList.add('ring-2', 'ring-white', 'scale-[1.02]');
+            actionBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-[1.02]');
         }
     }
     
@@ -946,90 +877,74 @@
     let spaceHoldInterval = null;
     
     document.addEventListener('keydown', (e) => {
-      // Reject any key that isn't Makey Makey approved
       if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) return;
-      e.preventDefault(); // Prevent page scrolling
-
-      // Save for movement loop
-      const keyName = e.key === ' ' ? 'space' : e.key.toLowerCase();
-      keysPressed[keyName] = true;
+      e.preventDefault(); 
+      keysPressed[e.key === ' ' ? 'space' : e.key.toLowerCase()] = true;
 
       // MENU SCREEN
       if (gameState.screen === 'menu-screen') {
         if (e.key === 'ArrowUp') { menuFocusIndex = 0; updateMenuFocus(); }
         if (e.key === 'ArrowDown') { menuFocusIndex = 1; updateMenuFocus(); }
-        if (e.key === ' ' && !e.repeat) {
-          menuFocusIndex === 0 ? showScreen('how-to-play-screen') : startGame();
-        }
+        if (e.key === ' ' && !e.repeat) { menuFocusIndex === 0 ? showScreen('how-to-play-screen') : startGame(); }
         return;
       }
 
       // HOW TO PLAY SCREEN
       if (gameState.screen === 'how-to-play-screen') {
-        const screen = document.getElementById('how-to-play-screen');
-        if (e.key === 'ArrowUp') { screen.scrollTop -= 150; }
-        if (e.key === 'ArrowDown') { screen.scrollTop += 150; }
-        if (e.key === ' ' && !e.repeat) { showScreen('menu-screen'); }
+        if (e.key === ' ' && !e.repeat) showScreen('menu-screen');
         return;
       }
       
       // RESULTS SCREEN
       if (gameState.screen === 'results-screen') {
-          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-              resultsFocusIndex = resultsFocusIndex === 0 ? 1 : 0;
-              updateResultsFocus();
-          } else if (e.key === ' ' && !e.repeat) {
-              if (resultsFocusIndex === 0) document.getElementById('results-action-btn').click();
-              else document.getElementById('results-home-btn').click();
-          }
+          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { resultsFocusIndex = resultsFocusIndex === 0 ? 1 : 0; updateResultsFocus(); }
+          else if (e.key === ' ' && !e.repeat) { resultsFocusIndex === 0 ? document.getElementById('results-action-btn').click() : document.getElementById('results-home-btn').click(); }
           return;
       }
       
-      // SHOP SCREEN
+      // SHOP SCREEN (4x3 left, 2x5 right)
       if (gameState.screen === 'shop-screen') {
-        const itemsArray = Object.keys(items);
+        const itemsLen = Object.keys(items).length; // 12
         if (shopMode === 'items') {
           if (e.key === 'ArrowRight') {
-            if (gameState.shopSelectedIndex % 2 === 1) { shopMode = 'cart'; gameState.cartSelectedIndex = 0; }
+            if (gameState.shopSelectedIndex % 4 === 3) { shopMode = 'cart'; gameState.cartSelectedIndex = Math.floor(gameState.shopSelectedIndex / 4) * 2; }
             else { gameState.shopSelectedIndex++; }
           }
-          if (e.key === 'ArrowLeft') {
-            if (gameState.shopSelectedIndex % 2 === 1) { gameState.shopSelectedIndex--; }
-          }
-          if (e.key === 'ArrowDown') { gameState.shopSelectedIndex = Math.min(itemsArray.length - 1, gameState.shopSelectedIndex + 2); }
-          if (e.key === 'ArrowUp') { gameState.shopSelectedIndex = Math.max(0, gameState.shopSelectedIndex - 2); }
-          if (e.key === ' ' && !e.repeat) { addToCart(itemsArray[gameState.shopSelectedIndex]); }
+          if (e.key === 'ArrowLeft') { if (gameState.shopSelectedIndex % 4 !== 0) gameState.shopSelectedIndex--; }
+          if (e.key === 'ArrowDown') { gameState.shopSelectedIndex = Math.min(itemsLen - 1, gameState.shopSelectedIndex + 4); }
+          if (e.key === 'ArrowUp') { gameState.shopSelectedIndex = Math.max(0, gameState.shopSelectedIndex - 4); }
+          if (e.key === ' ' && !e.repeat) { addToCart(Object.keys(items)[gameState.shopSelectedIndex]); }
         } else if (shopMode === 'cart') {
-          if (e.key === 'ArrowRight') {
-            if (gameState.cartSelectedIndex % 3 !== 2) { gameState.cartSelectedIndex = Math.min(9, gameState.cartSelectedIndex + 1); }
-          }
+          if (e.key === 'ArrowRight') { if (gameState.cartSelectedIndex % 2 !== 1) gameState.cartSelectedIndex = Math.min(9, gameState.cartSelectedIndex + 1); }
           if (e.key === 'ArrowLeft') {
-            if (gameState.cartSelectedIndex % 3 === 0) { shopMode = 'items'; gameState.shopSelectedIndex = 1; }
+            if (gameState.cartSelectedIndex % 2 === 0) { 
+               shopMode = 'items'; 
+               gameState.shopSelectedIndex = Math.min(11, Math.floor(gameState.cartSelectedIndex / 2) * 4 + 3);
+            }
             else { gameState.cartSelectedIndex--; }
           }
           if (e.key === 'ArrowDown') {
-            if (gameState.cartSelectedIndex + 3 > 9) { shopMode = 'checkout'; }
-            else { gameState.cartSelectedIndex += 3; }
+            if (gameState.cartSelectedIndex + 2 > 9) shopMode = 'checkout';
+            else gameState.cartSelectedIndex += 2;
           }
-          if (e.key === 'ArrowUp') { gameState.cartSelectedIndex = Math.max(0, gameState.cartSelectedIndex - 3); }
+          if (e.key === 'ArrowUp') { gameState.cartSelectedIndex = Math.max(0, gameState.cartSelectedIndex - 2); }
           if (e.key === ' ' && !e.repeat) { if (gameState.cart.length > 0 && gameState.cartSelectedIndex < gameState.cart.length) removeFromCart(); }
         } else if (shopMode === 'checkout') {
-          if (e.key === 'ArrowUp') { shopMode = 'cart'; gameState.cartSelectedIndex = 7; } // Back to bottom row of cart
-          if (e.key === ' ' && !e.repeat) { checkout(); }
+          if (e.key === 'ArrowUp') { shopMode = 'cart'; gameState.cartSelectedIndex = 8; }
+          if (e.key === ' ' && !e.repeat) checkout();
         }
         updateShopFocus();
         return;
       }
       
-      // GAME SCREEN (SPACEBAR LONG HOLD LOGIC)
+      // GAME SCREEN
       if (gameState.screen === 'game-screen' && e.key === ' ') {
           if (!spaceIsHeld) {
               spaceIsHeld = true;
-              // Start a timer. If space is held for 800ms and it's a consumable, consume it.
               spaceHoldInterval = setTimeout(() => {
                   if (spaceIsHeld && gameState.holdingItem && ['waterJugs', 'foodKit', 'firstAid'].includes(gameState.holdingItem.id)) {
                       useHeldItem();
-                      spaceIsHeld = false; // Prevent Short Press triggering on keyup
+                      spaceIsHeld = false;
                   }
               }, 800);
           }
@@ -1038,13 +953,11 @@
     
     document.addEventListener('keyup', (e) => {
       if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) return;
-      
-      const keyName = e.key === ' ' ? 'space' : e.key.toLowerCase();
-      keysPressed[keyName] = false;
+      keysPressed[e.key === ' ' ? 'space' : e.key.toLowerCase()] = false;
       
       if (gameState.screen === 'game-screen' && e.key === ' ') {
           clearTimeout(spaceHoldInterval);
-          if (spaceIsHeld) { // It wasn't consumed by long press timer
+          if (spaceIsHeld) {
               handleShortSpacePress();
               spaceIsHeld = false;
           }
@@ -1055,25 +968,16 @@
     function gameLoop() {
       if (gameState.screen === 'game-screen') {
         const speed = 0.8; 
-        
         let moved = false;
         if (keysPressed['arrowup']) { gameState.playerPos.y = Math.max(5, gameState.playerPos.y - speed); moved = true; }
         if (keysPressed['arrowdown']) { gameState.playerPos.y = Math.min(95, gameState.playerPos.y + speed); moved = true; }
         if (keysPressed['arrowleft']) { gameState.playerPos.x = Math.max(5, gameState.playerPos.x - speed); moved = true; }
         if (keysPressed['arrowright']) { gameState.playerPos.x = Math.min(95, gameState.playerPos.x + speed); moved = true; }
-        
         if (moved) updatePlayerPosition();
       }
       requestAnimationFrame(gameLoop);
     }
     
-    // Mouse Click Fallbacks (So you can still test it without the controller)
-    document.getElementById('start-menu-btn').addEventListener('click', startGame);
-    document.getElementById('how-to-play-btn').addEventListener('click', () => showScreen('how-to-play-screen'));
-    document.getElementById('back-to-menu-btn').addEventListener('click', () => showScreen('menu-screen'));
-    document.getElementById('checkout-btn').addEventListener('click', () => { if(shopMode === 'checkout') checkout() });
-    
-    // Init
     showScreen('menu-screen');
     updateMenuFocus();
     gameLoop();
