@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disasters Survival</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent body scroll during gameplay */
+    }
+    
+    body {
+      box-sizing: border-box;
+      background-color: #0f172a; /* Fallback for slate-900 */
+    }
+    
+    .font-title { font-family: 'Russo One', sans-serif; }
+    .font-body { font-family: 'Nunito', sans-serif; }
+    
+    @keyframes shake {
+      0%, 100% { transform: translate(0, 0); }
+      10%, 30%, 50%, 70%, 90% { transform: translate(-3px, 0); }
+      20%, 40%, 60%, 80% { transform: translate(3px, 0); }
+    }
+    
+    @keyframes rain {
+      0% { transform: translateY(-100%); opacity: 1; }
+      100% { transform: translateY(100%); opacity: 0.3; }
+    }
+    
+    @keyframes wind {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25% { transform: translateX(10px) rotate(5deg); }
+      75% { transform: translateX(-10px) rotate(-5deg); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 5px currentColor; }
+      50% { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+    }
+    
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .shake { animation: shake 0.5s ease-in-out infinite; }
+    .rain-effect { animation: rain 1s linear infinite; }
+    .wind-effect { animation: wind 2s ease-in-out infinite; }
+    .pulse-glow { animation: pulse-glow 1.5s ease-in-out infinite; }
+    .bounce-gentle { animation: bounce-gentle 2s ease-in-out infinite; }
+    
+    .player {
+      transition: none; /* Removed transition to avoid stutter in rAF loop */
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+    
+    .item-slot {
+      transition: all 0.2s ease;
+    }
+    
+    .item-slot:hover {
+      transform: scale(1.05);
+    }
+    
+    /* 3D House Effects */
+    .house-3d {
+      background: linear-gradient(135deg, #b86f2b 0%, #8b5a1f 50%, #5c3a0f 100%);
+      box-shadow: inset -2px -2px 8px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .zone-window {
+      background: linear-gradient(135deg, rgba(100, 200, 255, 0.3) 0%, rgba(50, 150, 255, 0.2) 100%);
+      box-shadow: inset 2px 2px 4px rgba(255,255,255,0.3), inset -2px -2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .zone-door {
+      background: linear-gradient(90deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .zone-safe {
+      background: linear-gradient(135deg, rgba(100, 255, 100, 0.2) 0%, rgba(50, 200, 50, 0.15) 100%);
+      box-shadow: inset 0 0 8px rgba(100, 255, 100, 0.3);
+    }
+    
+    .zone-supplies {
+      background: linear-gradient(135deg, #8b4789 0%, #5d3a5c 100%);
+      box-shadow: inset 0 0 6px rgba(255,255,255,0.2), 0 4px 8px rgba(0,0,0,0.4);
+    }
+    
+    .placed-item-badge {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,240,0.8) 100%);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 8px rgba(100,200,100,0.5);
+      border: 2px solid rgba(100,200,100,0.6);
+    }
+  </style>
+</head>
+<body class="h-full font-body">
+  <div id="app" class="h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-auto">
+    <!-- Main Menu -->
+    <div id="menu-screen" class="h-full flex flex-col items-center justify-center p-4">
+      <div class="text-center mb-8">
+        <h1 id="title-display" class="font-title text-5xl md:text-6xl text-yellow-400 mb-2 drop-shadow-lg bounce-gentle"> DISASTERS SURVIVAL</h1>
+        <p class="text-slate-300 text-lg md:text-xl max-w-md mx-auto mb-4">Get ready for adventure! Shop for cool supplies, build your home defenses, and save the day! </p>
+        <div class="flex justify-center gap-4 text-4xl">
+          <span>🌪️</span> <span>🌊</span> <span>🔥</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-4 w-full max-w-sm mx-auto text-center">
+        <p class="text-slate-400 mb-2 text-sm font-bold tracking-widest uppercase">Makey Makey Controller mode active!</p>
+        <button id="how-to-play-btn" class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-title text-2xl px-8 py-4 rounded-xl shadow-lg transform transition-all ring-4 ring-yellow-300"> HOW TO PLAY </button>
+        <button id="start-menu-btn" class="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-title text-3xl px-12 py-4 rounded-xl shadow-lg transform transition-all"> LET'S GO! </button>
+      </div>
+    </div>
+
+    <!-- How to Play Screen -->
+    <div id="how-to-play-screen" class="h-full hidden flex-col p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-auto">
+      <button id="back-to-menu-btn" class="self-start mb-4 bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-2 rounded-lg transition-all ring-2 ring-yellow-300 shadow-lg"> [SPACE] BACK TO MENU </button>
+      <div class="max-w-2xl mx-auto w-full pb-10">
+        <h1 class="font-title text-5xl text-yellow-400 mb-6 text-center drop-shadow-lg">📖 HOW TO PLAY (MAKEY MAKEY)</h1>
+        <div class="space-y-6">
+          <p class="text-center text-slate-300 font-bold bg-slate-800 p-3 rounded-lg border-2 border-slate-600">The entire game uses ONLY the Arrow Keys ⬅️➡️⬆️⬇️ and the Spacebar!</p>
+          
+          <!-- Phase 1: Shopping -->
+          <div class="bg-blue-900/80 backdrop-blur rounded-xl p-6 border-4 border-blue-400">
+            <h2 class="font-title text-2xl text-cyan-300 mb-4 flex items-center gap-2"><span class="text-3xl">🛒</span> PHASE 1: GEAR SHOPPING</h2>
+            <div class="space-y-3 text-slate-200">
+              <p class="font-semibold">A random disaster is coming! You start with <span class="text-green-300 font-bold">$500</span>.</p>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-cyan-400">
+                <p><span class="font-bold">⬅️ ➡️ ⬆️ ⬇️</span> Move your selection</p>
+              </div>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-cyan-400">
+                <p><span class="font-bold">SPACE</span> Buy an item (or remove it if in cart)</p>
+              </div>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-cyan-400">
+                <p><span class="font-bold">⬇️ To Bottom</span> Move cursor down to checkout to start game!</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Phase 2: Setup -->
+          <div class="bg-purple-900/80 backdrop-blur rounded-xl p-6 border-4 border-purple-400">
+            <h2 class="font-title text-2xl text-purple-300 mb-4 flex items-center gap-2"><span class="text-3xl">🏠</span> PHASE 2: SETUP YOUR HOME</h2>
+            <div class="space-y-3 text-slate-200">
+              <p class="font-semibold">Now place your gear around the house to prepare!</p>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-purple-400">
+                <p><span class="font-bold">⬅️ ➡️ ⬆️ ⬇️</span> Walk around your home</p>
+              </div>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-purple-400">
+                <p><span class="font-bold text-yellow-300">SPACE (near a zone)</span> Place/pickup held item</p>
+              </div>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-purple-400">
+                <p><span class="font-bold text-green-300">SPACE (in empty space)</span> Cycle to the next item in your bag!</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Phase 3: Survive -->
+          <div class="bg-red-900/80 backdrop-blur rounded-xl p-6 border-4 border-red-400">
+            <h2 class="font-title text-2xl text-red-300 mb-4 flex items-center gap-2"><span class="text-3xl">🌪️</span> PHASE 3: SURVIVE THE DISASTER!</h2>
+            <div class="space-y-3 text-slate-200">
+              <p class="font-semibold">The disaster automatically strikes after a 30s prep timer!</p>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-red-400">
+                <p><span class="font-bold">🛡️ Placed items</span> Reduce damage! More protection = less damage.</p>
+              </div>
+              <div class="bg-slate-800/50 rounded-lg p-3 border-l-4 border-blue-400">
+                <p><span class="font-bold text-cyan-300">HOLD SPACE (1 sec)</span> Consume a healing item you are holding!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shop-screen" class="h-full hidden flex-col p-4">
+      <div class="bg-blue-900/90 backdrop-blur rounded-xl p-4 mb-4 border-4 border-blue-400">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div>
+            <h2 class="font-title text-3xl text-cyan-300">🛒 GEAR SHOP</h2>
+            <div class="bg-orange-900/60 rounded-lg mt-2 p-3 border-2 border-orange-400">
+              <p class="text-slate-200 font-bold text-lg" id="disaster-coming">🚨 TORNADO INCOMING!</p>
+              <p class="text-slate-300 text-sm mt-1" id="disaster-description">Wind barriers and storm shutters will help protect your home!</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="text-center bg-green-900/50 px-4 py-2 rounded-lg border-2 border-green-400">
+              <p class="text-slate-400 text-xs font-bold">YOUR MONEY</p>
+              <p id="budget-display" class="font-title text-3xl text-green-300">$500</p>
+            </div>
+            <div class="text-center bg-orange-900/50 px-4 py-2 rounded-lg border-2 border-orange-400">
+              <p class="text-slate-400 text-xs font-bold">LEVEL</p>
+              <p id="wave-display" class="font-title text-3xl text-yellow-300">1</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex-1 grid md:grid-cols-2 gap-4 overflow-hidden">
+        <!-- Shop Items -->
+        <div class="bg-blue-900/80 rounded-xl p-4 border-3 border-cyan-400 flex flex-col h-full">
+          <h3 class="font-title text-xl text-cyan-300 mb-3">📦 PICK YOUR GEAR</h3>
+          <p class="text-slate-300 text-xs mb-2 font-semibold">ARROWS to move | SPACE to buy</p>
+          <div id="shop-items" class="grid grid-cols-2 gap-3 overflow-y-auto flex-1 pr-2 pb-8">
+            <!-- Items populated by JS -->
+          </div>
+        </div>
+        
+        <!-- Cart -->
+        <div class="bg-green-900/80 rounded-xl p-4 border-3 border-green-400 flex flex-col h-full relative">
+          <h3 class="font-title text-xl text-green-300 mb-3">🎒 MY GEAR BAG (Max 10)</h3>
+          <p class="text-slate-300 text-xs mb-2 font-semibold">ARROWS to move | SPACE to remove | Down to checkout</p>
+          <div id="cart-items" class="grid grid-cols-3 gap-2 mb-4 overflow-y-auto flex-1 pr-2">
+            <!-- Cart items populated by JS -->
+          </div>
+          <div class="border-t border-green-600 pt-3 mt-auto shrink-0">
+            <div class="flex justify-between text-slate-300 mb-2 text-lg">
+              <span>Total:</span> <span id="cart-total" class="font-bold text-green-300 text-xl">$0</span>
+            </div>
+            <button id="checkout-btn" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-3 rounded-lg transition-all text-lg shadow-lg"> LET'S PROTECT THE HOUSE! </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="h-full hidden flex-col">
+      <!-- HUD -->
+      <div class="bg-slate-900/95 p-3 border-b-2 border-slate-700">
+        <div class="flex flex-wrap justify-between items-center gap-2">
+          <div class="flex items-center gap-4">
+            <div class="text-center">
+              <p class="text-slate-500 text-xs font-bold">HEALTH</p>
+              <div class="relative w-32 h-5 bg-slate-700 rounded-full overflow-hidden border border-slate-600">
+                <div id="health-bar" class="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all shadow-lg" style="width: 100%"></div>
+                <p id="health-percent" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-900">100%</p>
+              </div>
+            </div>
+            <div class="text-center">
+              <p class="text-slate-500 text-xs font-bold">HOME STRENGTH</p>
+              <div class="relative w-32 h-5 bg-slate-700 rounded-full overflow-hidden border border-slate-600">
+                <div id="home-bar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all shadow-lg" style="width: 100%"></div>
+                <p id="home-percent" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-900">100%</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div id="disaster-indicator" class="px-4 py-2 rounded-lg bg-orange-500/20 border-2 border-orange-500/50">
+              <span class="text-orange-400 font-bold text-lg" id="current-disaster-display">🌪️ TORNADO</span>
+            </div>
+            <div class="text-center bg-yellow-900/50 px-4 py-2 rounded-lg border-2 border-yellow-400">
+              <p class="text-slate-400 text-xs font-bold">TIME LEFT</p>
+              <p id="timer-display" class="font-title text-2xl text-yellow-300">30</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Area -->
+      <div class="flex-1 relative overflow-hidden bg-gradient-to-b from-slate-700 to-slate-900" id="game-area">
+        <div id="house" class="absolute inset-4 md:inset-8 house-3d rounded-xl overflow-hidden border-4 border-amber-900">
+          <!-- Room grid background with 3D effect -->
+          <div class="absolute inset-0 grid grid-cols-4 grid-rows-3 opacity-15">
+            <div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div>
+            <div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div>
+            <div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div><div class="border border-amber-600"></div>
+          </div>
+          
+          <!-- Placement zones -->
+          <div id="placement-zones" class="absolute inset-0">
+            <!-- Windows -->
+            <div class="placement-zone zone-window absolute top-0 left-1/4 w-20 h-12 border-3 border-dashed border-cyan-500 rounded-lg flex flex-col items-center justify-center text-xs text-cyan-300 font-bold transition-all transform" data-zone="window-1" title="Window protection zone">
+              <div class="text-2xl">🪟</div><div class="text-xs mt-1">Window</div>
+            </div>
+            <div class="placement-zone zone-window absolute top-0 right-1/4 w-20 h-12 border-3 border-dashed border-cyan-500 rounded-lg flex flex-col items-center justify-center text-xs text-cyan-300 font-bold transition-all transform" data-zone="window-2" title="Window protection zone">
+              <div class="text-2xl">🪟</div><div class="text-xs mt-1">Window</div>
+            </div>
+            <div class="placement-zone zone-window absolute bottom-0 left-1/3 w-20 h-12 border-3 border-dashed border-cyan-500 rounded-lg flex flex-col items-center justify-center text-xs text-cyan-300 font-bold transition-all transform" data-zone="window-3" title="Window protection zone">
+              <div class="text-2xl">🪟</div><div class="text-xs mt-1">Window</div>
+            </div>
+            <!-- Door -->
+            <div class="placement-zone zone-door absolute right-0 top-1/2 -translate-y-1/2 w-12 h-20 border-3 border-dashed border-amber-600 rounded-lg flex flex-col items-center justify-center text-xs text-amber-300 font-bold transition-all transform" data-zone="door" title="Door protection zone">
+              <div class="text-2xl">🚪</div><div class="text-xs mt-1">Door</div>
+            </div>
+            <!-- Supply areas -->
+            <div class="placement-zone zone-supplies absolute bottom-3 left-3 w-24 h-24 border-3 border-dashed border-purple-500 rounded-lg flex flex-col items-center justify-center text-xs text-purple-300 font-bold transition-all transform" data-zone="supplies-1" title="Supply storage area">
+              <div class="text-2xl">📦</div><div class="text-xs mt-1">Supplies</div>
+            </div>
+            <div class="placement-zone zone-supplies absolute top-3 right-3 w-24 h-24 border-3 border-dashed border-purple-500 rounded-lg flex flex-col items-center justify-center text-xs text-purple-300 font-bold transition-all transform" data-zone="supplies-2" title="Supply storage area">
+              <div class="text-2xl">📦</div><div class="text-xs mt-1">Supplies</div>
+            </div>
+          </div>
+          
+          <!-- Placed items container -->
+          <div id="placed-items" class="absolute inset-0 pointer-events-none"></div>
+          
+          <!-- Player -->
+          <div id="player" class="player absolute w-12 h-12 bg-gradient-to-b from-yellow-300 to-orange-500 rounded-full border-3 border-white shadow-xl flex items-center justify-center text-2xl z-20" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
+            🏃
+          </div>
+        </div>
+        
+        <!-- Disaster effects overlay -->
+        <div id="disaster-overlay" class="absolute inset-0 pointer-events-none z-30 hidden"></div>
+        
+        <!-- Action bar -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur rounded-xl p-3 border-2 border-slate-600 z-40 shadow-xl flex items-center justify-between gap-4 w-[90%] md:w-auto">
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-slate-300 text-[10px] md:text-xs font-bold hidden md:inline">HOLDING:</span>
+            <div id="holding-item" class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg border-2 border-slate-500 flex items-center justify-center text-2xl shadow-md">
+              -
+            </div>
+            <span id="holding-name" class="text-slate-200 text-xs md:text-sm font-semibold min-w-[60px] md:min-w-[90px]">Nothing</span>
+          </div>
+          <div class="flex flex-col text-slate-300 text-[10px] md:text-xs font-bold border-l-2 border-slate-600 pl-4 w-full text-center md:text-left leading-tight">
+            <p class="mb-1">🎮 <span class="text-cyan-300">ARROWS</span>: Walk &nbsp;|&nbsp; <span class="text-green-300">SPACE (near zone)</span>: Place/Pick</p>
+            <p>🔄 <span class="text-yellow-300">SPACE (empty area)</span>: Cycle Bag &nbsp;|&nbsp; ❤️ <span class="text-red-300">HOLD SPACE (1s)</span>: Heal</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Panel Bottom Bar -->
+      <div class="bg-slate-900/95 p-3 border-t-2 border-slate-700">
+        <div class="flex items-center gap-4 overflow-x-auto pb-1">
+          <span class="text-slate-300 text-sm font-bold whitespace-nowrap hidden md:inline">QUICK SLOTS:</span>
+          <div id="inventory-slots" class="flex gap-2">
+            <!-- Inventory populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="h-full hidden flex-col items-center justify-center p-4">
+      <div id="results-content" class="bg-slate-800/95 backdrop-blur rounded-2xl p-8 border-4 border-slate-600 text-center max-w-md shadow-2xl">
+        <!-- Results populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State variables
+    let shopMode = 'items'; // 'items', 'cart', or 'checkout'
+    let menuFocusIndex = 0; // 0 = HOW TO PLAY, 1 = START
+    let resultsFocusIndex = 0; // 0 = Action button, 1 = Home button
+    
+    // Game State
+    let gameState = {
+      screen: 'menu',
+      money: 500,
+      wave: 1,
+      health: 100,
+      homeIntegrity: 100,
+      cart: [],
+      inventory: [],
+      placedItems: {},
+      playerPos: { x: 50, y: 50 },
+      holdingItem: null,
+      currentDisaster: null,
+      timer: 30,
+      gameInterval: null,
+      disasterActive: false,
+      shopSelectedIndex: 0,
+      cartSelectedIndex: -1,
+      selectedSlot: null
+    };
+    
+    // Items Database 
+    const items = {
+      waterJugs: { name: "Water Bottles", icon: "💧", price: 30, protection: { all: 10 }, health: 5, zone: "supplies" },
+      foodKit: { name: "Snack Pack", icon: "🥫", price: 35, protection: { all: 8 }, health: 5, zone: "supplies" },
+      firstAid: { name: "First Aid Kit", icon: "🚑", price: 50, protection: { all: 5 }, health: 5, zone: "supplies" },
+      sandbags: { name: "Sand Barriers", icon: "🧱", price: 30, protection: { flood: 25, hurricane: 15 }, zone: "door" },
+      boardsWindow: { name: "Window Shields", icon: "🪵", price: 45, protection: { tornado: 25, hurricane: 30 }, zone: "window" },
+      helmet: { name: "Safety Helmet", icon: "⛑️", price: 40, protection: { earthquake: 40, tornado: 20 }, health: 10, zone: "safe-zone" },
+      flashlight: { name: "Flashlight", icon: "🔦", price: 25, protection: { all: 5 }, zone: "supplies" },
+      radio: { name: "Weather Radio", icon: "📻", price: 45, protection: { all: 15 }, zone: "supplies" },
+      blankets: { name: "Blankets", icon: "🛌", price: 40, protection: { all: 10 }, health: 15, zone: "safe-zone" },
+      fireExtinguisher: { name: "Fire Extinguisher", icon: "🧯", price: 80, protection: { fire: 60, earthquake: 5 }, zone: "supplies" },
+      generator: { name: "Power Generator", icon: "⚡", price: 130, protection: { all: 20 }, zone: "supplies" },
+      rope: { name: "Rope & Straps", icon: "🪢", price: 35, protection: { earthquake: 30 }, zone: "safe-zone" }
+    };
+    
+    // Disasters Database
+    const disasters = [
+      { id: "tornado", name: "🌪️ TORNADO", description: "Strong winds are coming! Use window shields and sand barriers to protect your home from flying debris!" },
+      { id: "flood", name: "🌊 FLOOD", description: "Heavy rain and water are coming! Sand barriers and elevated supplies will help keep water out!" },
+      { id: "earthquake", name: "💥 EARTHQUAKE", description: "The ground will shake! Safety helmets and secured furniture help protect you inside!" },
+      { id: "hurricane", name: "🌀 HURRICANE", description: "Powerful winds and rain are headed your way! Strong window shields and barriers will help!" },
+      { id: "fire", name: "🔥 WILDFIRE", description: "Fire is spreading! Fire extinguishers and safe shelter are critical!" }
+    ];
+    
+    // UI Helpers
+    function showScreen(screenId) {
+      document.querySelectorAll('#app > div').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('#app > div').forEach(s => s.classList.remove('flex'));
+      const screen = document.getElementById(screenId);
+      screen.classList.remove('hidden');
+      screen.classList.add('flex');
+      gameState.screen = screenId;
+    }
+    
+    // Core Functions
+    function startGame() {
+      gameState = {
+        ...gameState,
+        money: 500,
+        wave: 1,
+        health: 100,
+        homeIntegrity: 100,
+        cart: [],
+        inventory: [],
+        placedItems: {},
+        playerPos: { x: 50, y: 50 },
+        holdingItem: null,
+        currentDisaster: disasters[Math.floor(Math.random() * disasters.length)],
+        disasterActive: false,
+        selectedSlot: null
+      };
+      shopMode = 'items';
+      gameState.shopSelectedIndex = 0;
+      showScreen('shop-screen');
+      updateShop();
+    }
+    
+    function updateShop() {
+      document.getElementById('budget-display').textContent = `$${gameState.money}`;
+      document.getElementById('wave-display').textContent = gameState.wave;
+      document.getElementById('disaster-coming').innerHTML = gameState.currentDisaster.name;
+      document.getElementById('disaster-description').textContent = gameState.currentDisaster.description;
+      
+      const shopContainer = document.getElementById('shop-items');
+      shopContainer.innerHTML = '';
+      
+      Object.entries(items).forEach(([id, item], index) => {
+        const canAfford = item.price <= gameState.money;
+        const isSelected = gameState.shopSelectedIndex === index;
+        const div = document.createElement('div');
+        div.className = `item-slot p-4 rounded-lg border-2 transition-all cursor-pointer ${isSelected && shopMode === 'items' ? 'border-yellow-300 bg-slate-600 ring-4 ring-yellow-300 scale-105 shadow-xl' : (canAfford ? 'bg-slate-700 border-slate-600 hover:border-cyan-400' : 'bg-slate-800 border-slate-700 opacity-50')}`;
+        div.innerHTML = `
+          <div class="text-3xl text-center mb-2">${item.icon}</div>
+          <p class="text-sm text-slate-300 text-center font-semibold truncate">${item.name}</p>
+          <p class="text-center font-bold mt-1 ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
+        `;
+        div.onclick = () => {
+          gameState.shopSelectedIndex = index;
+          shopMode = 'items';
+          addToCart(id);
+        };
+        // Scroll into view if selected
+        if (isSelected && shopMode === 'items') {
+            setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0);
+        }
+        shopContainer.appendChild(div);
+      });
+      
+      updateCart();
+      updateShopFocus();
+    }
+    
+    function addToCart(itemId) {
+      if (gameState.cart.length >= 10) {
+        const cartEl = document.getElementById('cart-items');
+        cartEl.classList.add('border-red-500', 'shake');
+        setTimeout(() => cartEl.classList.remove('border-red-500', 'shake'), 500);
+        return;
+      }
+      const item = items[itemId];
+      if (gameState.money >= item.price) {
+        gameState.money -= item.price;
+        gameState.cart.push({ ...item, id: itemId, uid: Date.now() + Math.random() });
+        gameState.cartSelectedIndex = gameState.cart.length - 1;
+        updateShop();
+      }
+    }
+    
+    function removeFromCart() {
+      if (gameState.cartSelectedIndex >= 0 && gameState.cartSelectedIndex < gameState.cart.length) {
+        const item = gameState.cart[gameState.cartSelectedIndex];
+        gameState.money += item.price;
+        gameState.cart.splice(gameState.cartSelectedIndex, 1);
+        
+        if (gameState.cartSelectedIndex >= gameState.cart.length) {
+          gameState.cartSelectedIndex = Math.max(0, gameState.cart.length - 1);
+        }
+        if (gameState.cart.length === 0) {
+           shopMode = 'items';
+        }
+        updateShop();
+      }
+    }
+    
+    function updateCart() {
+      const cartContainer = document.getElementById('cart-items');
+      cartContainer.innerHTML = '';
+      
+      let total = 0;
+      gameState.cart.forEach((item, index) => {
+        total += item.price;
+        const isSelected = gameState.cartSelectedIndex === index && shopMode === 'cart';
+        const div = document.createElement('div');
+        div.className = `bg-gradient-to-br p-2 rounded-lg text-center cursor-pointer transition-all border shadow-md ${isSelected ? 'from-yellow-500 to-yellow-600 border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'from-slate-600 to-slate-700 border-slate-500 hover:border-red-400'}`;
+        div.innerHTML = `
+          <div class="text-2xl">${item.icon}</div>
+          <p class="text-[10px] md:text-xs text-slate-300 truncate font-semibold">${item.name}</p>
+        `;
+        div.onclick = () => {
+          gameState.cartSelectedIndex = index;
+          shopMode = 'cart';
+          removeFromCart();
+        };
+        if (isSelected && shopMode === 'cart') {
+            setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0);
+        }
+        cartContainer.appendChild(div);
+      });
+      
+      // Pad empty slots up to 10
+      for(let i = gameState.cart.length; i < 10; i++) {
+        const isSelected = gameState.cartSelectedIndex === i && shopMode === 'cart';
+        const div = document.createElement('div');
+        div.className = `bg-slate-800/50 p-2 rounded-lg text-center border transition-all ${isSelected ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'border-slate-600 border-dashed opacity-50'}`;
+        div.innerHTML = `<div class="text-2xl invisible">-</div>`;
+        if (isSelected && shopMode === 'cart') {
+            setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0);
+        }
+        cartContainer.appendChild(div);
+      }
+      
+      document.getElementById('cart-total').textContent = `$${total}`;
+    }
+    
+    function checkout() {
+      gameState.inventory = [...gameState.cart];
+      while(gameState.inventory.length < 10) gameState.inventory.push(null); // pad empty slots
+      
+      gameState.cart = [];
+      gameState.cartSelectedIndex = -1;
+      gameState.placedItems = {};
+      gameState.holdingItem = null;
+      gameState.playerPos = { x: 50, y: 50 };
+      gameState.timer = 40;
+      gameState.disasterActive = false;
+      gameState.selectedSlot = null;
+      shopMode = 'items';
+      
+      showScreen('game-screen');
+      updateGameUI();
+      updateInventoryDisplay();
+      updatePlacedItems();
+      
+      document.getElementById('disaster-indicator').className = 'px-4 py-2 rounded-lg bg-yellow-500/20 border-2 border-yellow-500 text-lg font-bold pulse-glow';
+      document.getElementById('current-disaster-display').textContent = '⚠️ PREP PHASE';
+      
+      // Auto Start Timer setup
+      let prepTime = 30;
+      document.getElementById('timer-display').textContent = prepTime + 's';
+      if (gameState.gameInterval) clearInterval(gameState.gameInterval);
+      
+      gameState.gameInterval = setInterval(() => {
+        prepTime--;
+        document.getElementById('timer-display').textContent = prepTime + 's';
+        if (prepTime <= 0) {
+            clearInterval(gameState.gameInterval);
+            startDisaster();
+        }
+      }, 1000);
+    }
+    
+    function startDisaster() {
+      gameState.disasterActive = true;
+      document.getElementById('disaster-indicator').className = 'px-4 py-2 rounded-lg bg-red-500/30 border-2 border-red-500 pulse-glow text-lg font-bold';
+      document.getElementById('current-disaster-display').textContent = gameState.currentDisaster.name + ' HERE!';
+      
+      const overlay = document.getElementById('disaster-overlay');
+      overlay.classList.remove('hidden');
+      overlay.innerHTML = getDisasterEffects();
+      
+      const house = document.getElementById('house');
+      if (['earthquake', 'tornado'].includes(gameState.currentDisaster.id)) {
+        house.classList.add('shake');
+      }
+      
+      let disasterTime = Math.round((15 + (gameState.wave * 2)) * Math.pow(1.1, gameState.wave - 1));
+      document.getElementById('timer-display').textContent = disasterTime;
+      
+      let tickCount = 0;
+      gameState.gameInterval = setInterval(() => {
+        disasterTime--;
+        tickCount++;
+        document.getElementById('timer-display').textContent = disasterTime;
+        
+        if (tickCount % 2 === 0) applyDisasterDamage();
+        
+        if (disasterTime <= 0 || gameState.health <= 0 || gameState.homeIntegrity <= 0) {
+          clearInterval(gameState.gameInterval);
+          endDisaster();
+        }
+      }, 1000);
+    }
+    
+    function getDisasterEffects() {
+      switch (gameState.currentDisaster.id) {
+        case 'tornado': return `<div class="absolute inset-0 bg-gray-900/50 flex items-center justify-center"><div class="text-9xl wind-effect">🌪️</div></div>`;
+        case 'flood': return `<div class="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-blue-600/70 to-transparent animate-pulse"></div>`;
+        case 'earthquake': return `<div class="absolute inset-0 bg-amber-900/30"></div>`;
+        case 'hurricane': return `<div class="absolute inset-0 bg-teal-900/40">
+            <div class="absolute top-0 left-0 w-2 h-full bg-blue-400/60 rain-effect"></div>
+            <div class="absolute top-0 left-1/4 w-1 h-full bg-blue-400/60 rain-effect" style="animation-delay: 0.2s"></div>
+            <div class="absolute top-0 left-1/2 w-2 h-full bg-blue-400/60 rain-effect" style="animation-delay: 0.4s"></div>
+            <div class="absolute top-0 left-3/4 w-1 h-full bg-blue-400/60 rain-effect" style="animation-delay: 0.6s"></div>
+          </div>`;
+        case 'fire': return `<div class="absolute inset-0 bg-gradient-to-t from-orange-600/50 via-red-600/30 to-transparent">
+            <div class="absolute bottom-0 left-1/4 text-5xl animate-pulse">🔥</div>
+            <div class="absolute bottom-0 right-1/4 text-5xl animate-pulse" style="animation-delay: 0.3s">🔥</div>
+          </div>`;
+        default: return '';
+      }
+    }
+    
+    function applyDisasterDamage() {
+      const disasterId = gameState.currentDisaster.id;
+      let protection = 0;
+      
+      Object.values(gameState.placedItems).forEach(item => {
+        if (item.protection[disasterId]) protection += item.protection[disasterId];
+        if (item.protection.all) protection += item.protection.all;
+      });
+      
+      let unprotectedCount = 0;
+      document.querySelectorAll('.placement-zone').forEach(zone => {
+        if (!gameState.placedItems[zone.dataset.zone]) unprotectedCount++;
+      });
+      
+      const protectionMultiplier = Math.max(0.5, 1 - (protection / 100));
+      const unprotectedDamage = unprotectedCount * 2;
+      
+      gameState.health = Math.max(0, gameState.health - ((2 + unprotectedDamage) * protectionMultiplier));
+      gameState.homeIntegrity = Math.max(0, gameState.homeIntegrity - ((1.5 + unprotectedDamage) * protectionMultiplier));
+      updateGameUI();
+    }
+    
+    function endDisaster() {
+      gameState.disasterActive = false;
+      document.getElementById('disaster-overlay').classList.add('hidden');
+      document.getElementById('house').classList.remove('shake');
+      showResults();
+    }
+    
+    function showResults() {
+      const survived = gameState.health > 0 && gameState.homeIntegrity > 0;
+      const earnings = survived ? 100 + (gameState.wave * 10) : 0;
+      const content = document.getElementById('results-content');
+      
+      resultsFocusIndex = 0; // Default to the top action button
+      
+      if (survived) {
+        content.innerHTML = `
+          <div class="text-8xl mb-4 bounce-gentle">🏆</div>
+          <h2 class="font-title text-4xl text-green-400 mb-2">AWESOME! YOU SURVIVED!</h2>
+          <p class="text-slate-300 mb-6 text-lg font-semibold">Level ${gameState.wave} Complete!</p>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-green-900/60 rounded-lg p-4 border-2 border-green-400">
+              <p class="text-slate-300 text-xs font-bold">YOUR HEALTH</p>
+              <p class="font-title text-3xl text-green-400">${Math.round(gameState.health)}%</p>
+            </div>
+            <div class="bg-blue-900/60 rounded-lg p-4 border-2 border-blue-400">
+              <p class="text-slate-300 text-xs font-bold">HOUSE SAFETY</p>
+              <p class="font-title text-3xl text-blue-400">${Math.round(gameState.homeIntegrity)}%</p>
+            </div>
+          </div>
+          <div class="bg-yellow-900/60 rounded-lg p-4 mb-6 border-3 border-yellow-400">
+            <p class="text-slate-300 text-xs font-bold">MONEY EARNED</p>
+            <p class="font-title text-4xl text-yellow-300">+$${earnings}</p>
+          </div>
+          <button id="results-action-btn" onclick="nextWave(${earnings})" class="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 rounded-lg transition-all mb-3 text-xl shadow-lg ring-4 ring-yellow-300 scale-105"> NEXT LEVEL </button>
+          <button id="results-home-btn" onclick="showScreen('menu-screen')" class="w-full bg-slate-600 hover:bg-slate-700 text-slate-100 font-bold py-2 rounded-lg transition-all"> Back Home </button>
+        `;
+      } else {
+        content.innerHTML = `
+          <div class="text-8xl mb-4">💀</div>
+          <h2 class="font-title text-4xl text-orange-400 mb-2">OOPS! YOU FAILED!</h2>
+          <p class="text-slate-300 mb-6 text-lg font-semibold">You made it to Level ${gameState.wave}</p>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-orange-900/60 rounded-lg p-4 border-2 border-orange-400">
+              <p class="text-slate-300 text-xs font-bold">FINAL HEALTH</p>
+              <p class="font-title text-3xl text-orange-400">${Math.round(gameState.health)}%</p>
+            </div>
+            <div class="bg-red-900/60 rounded-lg p-4 border-2 border-red-400">
+              <p class="text-slate-300 text-xs font-bold">HOUSE DAMAGE</p>
+              <p class="font-title text-3xl text-red-400">${Math.round(gameState.homeIntegrity)}%</p>
+            </div>
+          </div>
+          <button id="results-action-btn" onclick="startGame()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold py-4 rounded-lg transition-all mb-3 text-xl shadow-lg ring-4 ring-yellow-300 scale-105"> TRY AGAIN </button>
+          <button id="results-home-btn" onclick="showScreen('menu-screen')" class="w-full bg-slate-600 hover:bg-slate-700 text-slate-100 font-bold py-2 rounded-lg transition-all"> Back Home </button>
+        `;
+      }
+      showScreen('results-screen');
+    }
+    
+    function nextWave(earnings) {
+      gameState.wave++;
+      gameState.money += earnings;
+      gameState.currentDisaster = disasters[Math.floor(Math.random() * disasters.length)];
+      gameState.cart = [];
+      showScreen('shop-screen');
+      updateShop();
+    }
+    
+    function updatePlayerPosition() {
+      const player = document.getElementById('player');
+      player.style.left = `${gameState.playerPos.x}%`;
+      player.style.top = `${gameState.playerPos.y}%`;
+    }
+
+    function updateGameUI() {
+      document.getElementById('health-bar').style.width = `${gameState.health}%`;
+      document.getElementById('health-percent').textContent = `${Math.round(gameState.health)}%`;
+      document.getElementById('home-bar').style.width = `${gameState.homeIntegrity}%`;
+      document.getElementById('home-percent').textContent = `${Math.round(gameState.homeIntegrity)}%`;
+      
+      const holdingDisplay = document.getElementById('holding-item');
+      const holdingName = document.getElementById('holding-name');
+      if (gameState.holdingItem) {
+        holdingDisplay.textContent = gameState.holdingItem.icon;
+        holdingName.textContent = gameState.holdingItem.name;
+      } else {
+        holdingDisplay.textContent = '🚫';
+        holdingName.textContent = 'Nothing';
+      }
+      updatePlayerPosition();
+    }
+    
+    function updateInventoryDisplay() {
+      const container = document.getElementById('inventory-slots');
+      container.innerHTML = '';
+      
+      for (let i = 0; i < 10; i++) {
+        const item = gameState.inventory[i];
+        const div = document.createElement('div');
+        div.className = `relative min-w-[3.5rem] h-14 md:w-16 md:h-16 rounded-lg border-2 flex flex-col items-center justify-center cursor-pointer transition-all shadow-md ${
+          gameState.selectedSlot === i ? 'border-yellow-300 bg-gradient-to-br from-yellow-600 to-yellow-700 hover:from-yellow-500' :
+          (item ? 'border-slate-500 bg-gradient-to-br from-slate-600 to-slate-700 hover:border-yellow-400' : 'border-slate-500 bg-slate-800/50 hover:bg-slate-700/50 hover:border-yellow-400')
+        }`;
+        
+        div.innerHTML = `
+          <div class="text-xl md:text-2xl">${item ? item.icon : ' '}</div>
+          <div class="text-[10px] md:text-xs font-bold text-yellow-300 absolute bottom-1 right-1.5">${i === 9 ? 0 : i+1}</div>
+        `;
+        div.onclick = () => { /* Mouse fallback to simulate cycle */ cycleInventoryTo(i); };
+        container.appendChild(div);
+      }
+    }
+    
+    function cycleInventory() {
+      // Find the next available item starting from current slot
+      let startIndex = gameState.selectedSlot === null ? 0 : (gameState.selectedSlot + 1) % 10;
+      let foundIndex = -1;
+      
+      for (let i = 0; i < 10; i++) {
+          let checkIndex = (startIndex + i) % 10;
+          if (gameState.inventory[checkIndex] !== null || (gameState.holdingItem && gameState.selectedSlot === checkIndex)) {
+              foundIndex = checkIndex;
+              break;
+          }
+      }
+      
+      if (foundIndex !== -1 && foundIndex !== gameState.selectedSlot) {
+          cycleInventoryTo(foundIndex);
+      }
+    }
+
+    function cycleInventoryTo(index) {
+      if (!gameState.inventory[index] && !gameState.holdingItem) return;
+      
+      // Swap whatever we are holding with the new slot
+      if (gameState.holdingItem && gameState.selectedSlot !== null) {
+          gameState.inventory[gameState.selectedSlot] = gameState.holdingItem;
+      }
+      
+      gameState.selectedSlot = index;
+      gameState.holdingItem = gameState.inventory[index];
+      gameState.inventory[index] = null;
+      
+      updateInventoryDisplay();
+      updateGameUI();
+    }
+    
+    function useHeldItem() {
+      if (!gameState.holdingItem) return;
+      
+      const item = gameState.holdingItem;
+      const consumables = ['waterJugs', 'foodKit', 'firstAid'];
+      if (consumables.includes(item.id)) {
+        gameState.health = Math.min(100, gameState.health + item.health);
+        gameState.holdingItem = null;
+        updateInventoryDisplay();
+        updateGameUI();
+        showConsumptionFeedback(item);
+      } else {
+        // Visual shake feedback for non-consumable items
+        const player = document.getElementById('player');
+        player.classList.add('shake');
+        setTimeout(() => player.classList.remove('shake'), 400);
+      }
+    }
+    
+    function showConsumptionFeedback(item) {
+      const feedback = document.createElement('div');
+      feedback.className = 'fixed top-1/4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-4 rounded-lg font-bold text-xl shadow-xl animate-bounce z-50';
+      feedback.textContent = `${item.icon} ${item.name} used! +${item.health} HP`;
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 2000);
+    }
+    
+    function updatePlacedItems() {
+      const container = document.getElementById('placed-items');
+      container.innerHTML = '';
+      
+      Object.entries(gameState.placedItems).forEach(([zone, item]) => {
+        const zoneEl = document.querySelector(`[data-zone="${zone}"]`);
+        if (zoneEl) {
+          const rect = zoneEl.getBoundingClientRect();
+          const houseRect = document.getElementById('house').getBoundingClientRect();
+          
+          const div = document.createElement('div');
+          div.className = 'placed-item-badge absolute flex flex-col items-center justify-center rounded-lg font-bold text-xs pointer-events-auto';
+          div.style.left = `${((rect.left - houseRect.left) / houseRect.width) * 100}%`;
+          div.style.top = `${((rect.top - houseRect.top) / houseRect.height) * 100}%`;
+          div.style.width = `${(rect.width / houseRect.width) * 100}%`;
+          div.style.height = `${(rect.height / houseRect.height) * 100}%`;
+          div.innerHTML = `<div class="text-3xl">${item.icon}</div><div class="text-slate-800 mt-1 text-center hidden md:block">${item.name}</div>`;
+          div.title = item.name;
+          container.appendChild(div);
+        }
+      });
+    }
+    
+    function handleShortSpacePress() {
+      if (gameState.screen !== 'game-screen') return;
+
+      const zones = document.querySelectorAll('.placement-zone');
+      let nearestZone = null;
+      let minDist = 20; // 20% distance threshold
+      
+      zones.forEach(zone => {
+        const rect = zone.getBoundingClientRect();
+        const houseRect = document.getElementById('house').getBoundingClientRect();
+        const zoneX = ((rect.left - houseRect.left + rect.width / 2) / houseRect.width) * 100;
+        const zoneY = ((rect.top - houseRect.top + rect.height / 2) / houseRect.height) * 100;
+        const dist = Math.sqrt(Math.pow(gameState.playerPos.x - zoneX, 2) + Math.pow(gameState.playerPos.y - zoneY, 2));
+        
+        if (dist < minDist) {
+          minDist = dist;
+          nearestZone = zone.dataset.zone;
+        }
+      });
+      
+      if (nearestZone) {
+        // We are near a zone. Try placing or picking up.
+        if (gameState.holdingItem) {
+          // Swap if there is already an item here
+          let toInventory = null;
+          if (gameState.placedItems[nearestZone]) {
+            toInventory = gameState.placedItems[nearestZone];
+          }
+          gameState.placedItems[nearestZone] = gameState.holdingItem;
+          
+          if (toInventory) {
+             const emptySlot = gameState.inventory.findIndex(s => s === null);
+             if (emptySlot !== -1) gameState.inventory[emptySlot] = toInventory;
+             else gameState.holdingItem = toInventory; // keep holding old item if bag full
+          } else {
+             gameState.holdingItem = null;
+          }
+          
+          updatePlacedItems();
+          updateInventoryDisplay();
+          updateGameUI();
+        } else if (gameState.placedItems[nearestZone]) {
+          // Pick up placed item
+          gameState.holdingItem = gameState.placedItems[nearestZone];
+          delete gameState.placedItems[nearestZone];
+          updatePlacedItems();
+          updateGameUI();
+        }
+      } else {
+        // Not near any zone, cycle inventory
+        cycleInventory();
+      }
+    }
+    
+    function updateMenuFocus() {
+      const howToPlayBtn = document.getElementById('how-to-play-btn');
+      const startBtn = document.getElementById('start-menu-btn');
+      if (menuFocusIndex === 0) {
+        howToPlayBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-110');
+        startBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-110');
+      } else {
+        howToPlayBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-110');
+        startBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-110');
+      }
+    }
+    
+    function updateShopFocus() {
+      const shopItems = document.querySelectorAll('#shop-items .item-slot');
+      const cartItems = document.querySelectorAll('#cart-items > div');
+      const checkoutBtn = document.getElementById('checkout-btn');
+      
+      shopItems.forEach((item, idx) => item.classList.toggle('ring-4', idx === gameState.shopSelectedIndex && shopMode === 'items'));
+      shopItems.forEach((item, idx) => item.classList.toggle('scale-105', idx === gameState.shopSelectedIndex && shopMode === 'items'));
+      
+      cartItems.forEach((item, idx) => item.classList.toggle('ring-4', idx === gameState.cartSelectedIndex && shopMode === 'cart'));
+      cartItems.forEach((item, idx) => item.classList.toggle('scale-105', idx === gameState.cartSelectedIndex && shopMode === 'cart'));
+
+      if (shopMode === 'checkout') {
+          checkoutBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105');
+      } else {
+          checkoutBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
+      }
+    }
+
+    function updateResultsFocus() {
+        const actionBtn = document.getElementById('results-action-btn');
+        const homeBtn = document.getElementById('results-home-btn');
+        if (!actionBtn || !homeBtn) return;
+        
+        if (resultsFocusIndex === 0) {
+            actionBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105');
+            homeBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
+        } else {
+            homeBtn.classList.add('ring-4', 'ring-yellow-300', 'scale-105');
+            actionBtn.classList.remove('ring-4', 'ring-yellow-300', 'scale-105');
+        }
+    }
+    
+    // --- KEYBOARD CONTROLLERS (RESTRICTED TO 5 BUTTONS) ---
+    const keysPressed = {};
+    let spaceIsHeld = false;
+    let spaceHoldInterval = null;
+    
+    document.addEventListener('keydown', (e) => {
+      // Reject any key that isn't Makey Makey approved
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) return;
+      e.preventDefault(); // Prevent page scrolling
+
+      // Save for movement loop
+      const keyName = e.key === ' ' ? 'space' : e.key.toLowerCase();
+      keysPressed[keyName] = true;
+
+      // MENU SCREEN
+      if (gameState.screen === 'menu-screen') {
+        if (e.key === 'ArrowUp') { menuFocusIndex = 0; updateMenuFocus(); }
+        if (e.key === 'ArrowDown') { menuFocusIndex = 1; updateMenuFocus(); }
+        if (e.key === ' ' && !e.repeat) {
+          menuFocusIndex === 0 ? showScreen('how-to-play-screen') : startGame();
+        }
+        return;
+      }
+
+      // HOW TO PLAY SCREEN
+      if (gameState.screen === 'how-to-play-screen') {
+        const screen = document.getElementById('how-to-play-screen');
+        if (e.key === 'ArrowUp') { screen.scrollTop -= 150; }
+        if (e.key === 'ArrowDown') { screen.scrollTop += 150; }
+        if (e.key === ' ' && !e.repeat) { showScreen('menu-screen'); }
+        return;
+      }
+      
+      // RESULTS SCREEN
+      if (gameState.screen === 'results-screen') {
+          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              resultsFocusIndex = resultsFocusIndex === 0 ? 1 : 0;
+              updateResultsFocus();
+          } else if (e.key === ' ' && !e.repeat) {
+              if (resultsFocusIndex === 0) document.getElementById('results-action-btn').click();
+              else document.getElementById('results-home-btn').click();
+          }
+          return;
+      }
+      
+      // SHOP SCREEN
+      if (gameState.screen === 'shop-screen') {
+        const itemsArray = Object.keys(items);
+        if (shopMode === 'items') {
+          if (e.key === 'ArrowRight') {
+            if (gameState.shopSelectedIndex % 2 === 1) { shopMode = 'cart'; gameState.cartSelectedIndex = 0; }
+            else { gameState.shopSelectedIndex++; }
+          }
+          if (e.key === 'ArrowLeft') {
+            if (gameState.shopSelectedIndex % 2 === 1) { gameState.shopSelectedIndex--; }
+          }
+          if (e.key === 'ArrowDown') { gameState.shopSelectedIndex = Math.min(itemsArray.length - 1, gameState.shopSelectedIndex + 2); }
+          if (e.key === 'ArrowUp') { gameState.shopSelectedIndex = Math.max(0, gameState.shopSelectedIndex - 2); }
+          if (e.key === ' ' && !e.repeat) { addToCart(itemsArray[gameState.shopSelectedIndex]); }
+        } else if (shopMode === 'cart') {
+          if (e.key === 'ArrowRight') {
+            if (gameState.cartSelectedIndex % 3 !== 2) { gameState.cartSelectedIndex = Math.min(9, gameState.cartSelectedIndex + 1); }
+          }
+          if (e.key === 'ArrowLeft') {
+            if (gameState.cartSelectedIndex % 3 === 0) { shopMode = 'items'; gameState.shopSelectedIndex = 1; }
+            else { gameState.cartSelectedIndex--; }
+          }
+          if (e.key === 'ArrowDown') {
+            if (gameState.cartSelectedIndex + 3 > 9) { shopMode = 'checkout'; }
+            else { gameState.cartSelectedIndex += 3; }
+          }
+          if (e.key === 'ArrowUp') { gameState.cartSelectedIndex = Math.max(0, gameState.cartSelectedIndex - 3); }
+          if (e.key === ' ' && !e.repeat) { if (gameState.cart.length > 0 && gameState.cartSelectedIndex < gameState.cart.length) removeFromCart(); }
+        } else if (shopMode === 'checkout') {
+          if (e.key === 'ArrowUp') { shopMode = 'cart'; gameState.cartSelectedIndex = 7; } // Back to bottom row of cart
+          if (e.key === ' ' && !e.repeat) { checkout(); }
+        }
+        updateShopFocus();
+        return;
+      }
+      
+      // GAME SCREEN (SPACEBAR LONG HOLD LOGIC)
+      if (gameState.screen === 'game-screen' && e.key === ' ') {
+          if (!spaceIsHeld) {
+              spaceIsHeld = true;
+              // Start a timer. If space is held for 800ms and it's a consumable, consume it.
+              spaceHoldInterval = setTimeout(() => {
+                  if (spaceIsHeld && gameState.holdingItem && ['waterJugs', 'foodKit', 'firstAid'].includes(gameState.holdingItem.id)) {
+                      useHeldItem();
+                      spaceIsHeld = false; // Prevent Short Press triggering on keyup
+                  }
+              }, 800);
+          }
+      }
+    });
+    
+    document.addEventListener('keyup', (e) => {
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) return;
+      
+      const keyName = e.key === ' ' ? 'space' : e.key.toLowerCase();
+      keysPressed[keyName] = false;
+      
+      if (gameState.screen === 'game-screen' && e.key === ' ') {
+          clearTimeout(spaceHoldInterval);
+          if (spaceIsHeld) { // It wasn't consumed by long press timer
+              handleShortSpacePress();
+              spaceIsHeld = false;
+          }
+      }
+    });
+    
+    // Core Game Movement Loop
+    function gameLoop() {
+      if (gameState.screen === 'game-screen') {
+        const speed = 0.8; 
+        
+        let moved = false;
+        if (keysPressed['arrowup']) { gameState.playerPos.y = Math.max(5, gameState.playerPos.y - speed); moved = true; }
+        if (keysPressed['arrowdown']) { gameState.playerPos.y = Math.min(95, gameState.playerPos.y + speed); moved = true; }
+        if (keysPressed['arrowleft']) { gameState.playerPos.x = Math.max(5, gameState.playerPos.x - speed); moved = true; }
+        if (keysPressed['arrowright']) { gameState.playerPos.x = Math.min(95, gameState.playerPos.x + speed); moved = true; }
+        
+        if (moved) updatePlayerPosition();
+      }
+      requestAnimationFrame(gameLoop);
+    }
+    
+    // Mouse Click Fallbacks (So you can still test it without the controller)
+    document.getElementById('start-menu-btn').addEventListener('click', startGame);
+    document.getElementById('how-to-play-btn').addEventListener('click', () => showScreen('how-to-play-screen'));
+    document.getElementById('back-to-menu-btn').addEventListener('click', () => showScreen('menu-screen'));
+    document.getElementById('checkout-btn').addEventListener('click', () => { if(shopMode === 'checkout') checkout() });
+    
+    // Init
+    showScreen('menu-screen');
+    updateMenuFocus();
+    gameLoop();
+  </script>
+</body>
+</html>
