@@ -189,29 +189,29 @@
       <div class="flex-1 flex flex-row gap-2 min-h-0">
         <!-- Shop Items (Left) -->
         <div class="w-2/3 bg-blue-900/60 rounded-xl p-2 border-2 border-cyan-500 flex flex-col min-h-0">
-          <div class="flex justify-between items-center mb-2 shrink-0">
-             <h3 class="font-title text-lg text-cyan-300">📦 PICK YOUR GEAR</h3>
-             <p class="text-[10px] font-bold text-cyan-200">ARROWS move | SPACE buy</p>
+          <div class="flex justify-between items-center mb-1 shrink-0">
+             <h3 class="font-title text-base text-cyan-300">📦 PICK YOUR GEAR</h3>
+             <p class="text-[9px] font-bold text-cyan-200">ARROWS move | SPACE buy</p>
           </div>
-          <div id="shop-items" class="grid grid-cols-4 grid-rows-3 gap-2 flex-1 min-h-0">
+          <div id="shop-items" class="grid grid-cols-4 grid-rows-3 gap-1 flex-1 min-h-0">
             <!-- Items populated by JS -->
           </div>
         </div>
         
         <!-- Cart (Right) -->
         <div class="w-1/3 bg-green-900/60 rounded-xl p-2 border-2 border-green-500 flex flex-col min-h-0">
-          <div class="flex justify-between items-center mb-2 shrink-0">
-             <h3 class="font-title text-lg text-green-300">🎒 BAG <span class="text-xs text-green-200">(Max 10)</span></h3>
+          <div class="flex justify-between items-center mb-1 shrink-0">
+             <h3 class="font-title text-base text-green-300">🎒 BAG <span class="text-[10px] text-green-200">(Max 10)</span></h3>
           </div>
-          <p class="text-[10px] font-bold text-green-200 mb-2 shrink-0 text-center">ARROWS move | SPACE remove</p>
-          <div id="cart-items" class="grid grid-cols-2 grid-rows-5 gap-2 flex-1 min-h-0">
+          <p class="text-[9px] font-bold text-green-200 mb-1 shrink-0 text-center">ARROWS move | SPACE remove</p>
+          <div id="cart-items" class="grid grid-cols-2 grid-rows-5 gap-1 flex-1 min-h-0">
             <!-- Cart items populated by JS -->
           </div>
-          <div class="mt-2 pt-2 border-t border-green-500 shrink-0 flex flex-col gap-2">
-            <div class="flex justify-between text-sm items-end">
-              <span class="font-bold">Total:</span> <span id="cart-total" class="font-title text-xl text-green-300 leading-none">$0</span>
+          <div class="mt-1 pt-1 border-t border-green-500 shrink-0 flex flex-col gap-1">
+            <div class="flex justify-between text-xs items-end">
+              <span class="font-bold">Total:</span> <span id="cart-total" class="font-title text-lg text-green-300 leading-none">$0</span>
             </div>
-            <button id="checkout-btn" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-2 rounded-lg text-sm shadow-lg transition-transform"> LET'S PROTECT THE HOUSE! </button>
+            <button id="checkout-btn" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-1.5 rounded-lg text-xs shadow-lg transition-transform"> LET'S PROTECT THE HOUSE! </button>
           </div>
         </div>
       </div>
@@ -426,11 +426,11 @@
         const canAfford = item.price <= gameState.money;
         const isSelected = gameState.shopSelectedIndex === index;
         const div = document.createElement('div');
-        div.className = `item-slot p-1 flex flex-col items-center justify-center rounded-lg border-2 bg-slate-800/80 ${isSelected && shopMode === 'items' ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 shadow-xl z-10' : (canAfford ? 'border-slate-600' : 'border-slate-700 opacity-40')}`;
+        div.className = `item-slot p-1 flex flex-col items-center justify-center rounded-lg border-2 bg-slate-800/80 ${isSelected && shopMode === 'items' ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 shadow-xl z-10' : (canAfford ? 'border-slate-600' : 'border-slate-700 opacity-40')}`;
         div.innerHTML = `
-          <div class="text-2xl leading-none mb-1">${item.icon}</div>
-          <p class="text-[9px] text-slate-300 text-center font-bold leading-tight px-1 line-clamp-2 w-full">${item.name}</p>
-          <p class="text-[10px] font-bold mt-auto ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
+          <div class="text-xl leading-none mb-0.5">${item.icon}</div>
+          <p class="text-[8px] text-slate-300 text-center font-bold leading-tight px-0.5 line-clamp-2 w-full">${item.name}</p>
+          <p class="text-[9px] font-bold mt-auto ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
         `;
         shopContainer.appendChild(div);
       });
@@ -478,9 +478,9 @@
         total += item.price;
         const isSelected = gameState.cartSelectedIndex === index && shopMode === 'cart';
         const div = document.createElement('div');
-        div.className = `bg-slate-700 flex flex-col items-center justify-center rounded border shadow-inner ${isSelected ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'border-slate-500'}`;
+        div.className = `bg-slate-700 flex flex-col items-center justify-center rounded border shadow-inner ${isSelected ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 z-10' : 'border-slate-500'}`;
         div.innerHTML = `
-          <div class="text-xl leading-none">${item.icon}</div>
+          <div class="text-lg leading-none">${item.icon}</div>
           <div class="text-[8px] truncate w-full text-center px-1 font-bold text-slate-300">${item.name}</div>
         `;
         cartContainer.appendChild(div);
@@ -489,8 +489,8 @@
       for(let i = gameState.cart.length; i < 10; i++) {
         const isSelected = gameState.cartSelectedIndex === i && shopMode === 'cart';
         const div = document.createElement('div');
-        div.className = `bg-slate-800/50 rounded border flex items-center justify-center ${isSelected ? 'border-yellow-300 ring-4 ring-yellow-300 scale-105 z-10' : 'border-slate-600 border-dashed opacity-50'}`;
-        div.innerHTML = `<div class="text-xl invisible">-</div>`;
+        div.className = `bg-slate-800/50 rounded border flex items-center justify-center ${isSelected ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 z-10' : 'border-slate-600 border-dashed opacity-50'}`;
+        div.innerHTML = `<div class="text-lg invisible">-</div>`;
         cartContainer.appendChild(div);
       }
       
@@ -842,18 +842,18 @@
       const checkoutBtn = document.getElementById('checkout-btn');
       
       shopItems.forEach((item, idx) => {
-          item.classList.toggle('ring-4', idx === gameState.shopSelectedIndex && shopMode === 'items');
+          item.classList.toggle('ring-2', idx === gameState.shopSelectedIndex && shopMode === 'items');
           item.classList.toggle('scale-105', idx === gameState.shopSelectedIndex && shopMode === 'items');
           item.classList.toggle('border-yellow-300', idx === gameState.shopSelectedIndex && shopMode === 'items');
           item.classList.toggle('z-10', idx === gameState.shopSelectedIndex && shopMode === 'items');
       });
       cartItems.forEach((item, idx) => {
-          item.classList.toggle('ring-4', idx === gameState.cartSelectedIndex && shopMode === 'cart');
+          item.classList.toggle('ring-2', idx === gameState.cartSelectedIndex && shopMode === 'cart');
           item.classList.toggle('scale-105', idx === gameState.cartSelectedIndex && shopMode === 'cart');
           item.classList.toggle('border-yellow-300', idx === gameState.cartSelectedIndex && shopMode === 'cart');
           item.classList.toggle('z-10', idx === gameState.cartSelectedIndex && shopMode === 'cart');
       });
-      checkoutBtn.classList.toggle('ring-4', shopMode === 'checkout');
+      checkoutBtn.classList.toggle('ring-2', shopMode === 'checkout');
       checkoutBtn.classList.toggle('scale-[1.02]', shopMode === 'checkout');
     }
 
