@@ -427,12 +427,12 @@
         const isSelected = gameState.shopSelectedIndex === index;
         const div = document.createElement('div');
         
-        // Updated layout to completely fill grid space using flexbox
-        div.className = `item-slot p-2 flex flex-col items-center justify-between rounded-lg border-2 bg-slate-800/80 w-full h-full ${isSelected && shopMode === 'items' ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 shadow-xl z-10' : (canAfford ? 'border-slate-600' : 'border-slate-700 opacity-40')}`;
+        // Ensure flex layout stretches the item nicely across the box
+        div.className = `item-slot p-1 flex flex-col items-center justify-center rounded-lg border-2 bg-slate-800/80 w-full h-full ${isSelected && shopMode === 'items' ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 shadow-xl z-10' : (canAfford ? 'border-slate-600' : 'border-slate-700 opacity-40')}`;
         div.innerHTML = `
-          <div class="text-3xl md:text-4xl leading-none flex-1 flex items-center justify-center drop-shadow-md">${item.icon}</div>
-          <p class="text-[10px] md:text-xs text-slate-300 text-center font-bold leading-tight px-1 line-clamp-2 w-full shrink-0">${item.name}</p>
-          <p class="text-[10px] md:text-xs font-bold mt-1 shrink-0 ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
+          <div class="text-4xl md:text-5xl lg:text-6xl leading-none flex-1 flex items-center justify-center drop-shadow-md w-full">${item.icon}</div>
+          <p class="text-xs md:text-sm text-slate-300 text-center font-bold leading-tight px-1 line-clamp-1 w-full shrink-0 mt-1">${item.name}</p>
+          <p class="text-xs md:text-sm font-bold mt-1 shrink-0 ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
         `;
         shopContainer.appendChild(div);
       });
@@ -480,10 +480,10 @@
         total += item.price;
         const isSelected = gameState.cartSelectedIndex === index && shopMode === 'cart';
         const div = document.createElement('div');
-        div.className = `bg-slate-700 flex flex-col items-center justify-between p-1.5 rounded border shadow-inner w-full h-full ${isSelected ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 z-10' : 'border-slate-500'}`;
+        div.className = `bg-slate-700 flex flex-col items-center justify-center p-1 rounded border shadow-inner w-full h-full ${isSelected ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 z-10' : 'border-slate-500'}`;
         div.innerHTML = `
-          <div class="text-2xl md:text-3xl leading-none flex-1 flex items-center justify-center drop-shadow-md">${item.icon}</div>
-          <div class="text-[8px] md:text-[10px] truncate w-full text-center px-1 font-bold text-slate-300 shrink-0 mt-1">${item.name}</div>
+          <div class="text-3xl md:text-4xl lg:text-5xl leading-none flex-1 flex items-center justify-center drop-shadow-md w-full">${item.icon}</div>
+          <div class="text-[10px] md:text-xs truncate w-full text-center px-1 font-bold text-slate-300 shrink-0 mt-1">${item.name}</div>
         `;
         cartContainer.appendChild(div);
       });
@@ -492,7 +492,7 @@
         const isSelected = gameState.cartSelectedIndex === i && shopMode === 'cart';
         const div = document.createElement('div');
         div.className = `bg-slate-800/50 rounded border flex items-center justify-center w-full h-full ${isSelected ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 z-10' : 'border-slate-600 border-dashed opacity-50'}`;
-        div.innerHTML = `<div class="text-2xl md:text-3xl invisible">-</div>`;
+        div.innerHTML = `<div class="text-3xl md:text-4xl lg:text-5xl invisible">-</div>`;
         cartContainer.appendChild(div);
       }
       
