@@ -208,11 +208,11 @@
           <div id="cart-items" class="grid grid-cols-2 grid-rows-5 gap-2 flex-1 min-h-0">
             <!-- Cart items populated by JS -->
           </div>
-          <div class="mt-1 pt-1 border-t border-green-500 shrink-0 flex flex-col gap-1">
-            <div class="flex justify-between text-xs items-end">
-              <span class="font-bold">Total:</span> <span id="cart-total" class="font-title text-lg text-green-300 leading-none">$0</span>
+          <div class="mt-1 md:mt-2 pt-1 md:pt-2 border-t border-green-500 shrink-0 flex flex-col gap-1 md:gap-2">
+            <div class="flex justify-between text-xs md:text-sm items-end">
+              <span class="font-bold">Total:</span> <span id="cart-total" class="font-title text-lg md:text-xl text-green-300 leading-none">$0</span>
             </div>
-            <button id="checkout-btn" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-1.5 rounded-lg text-xs shadow-lg transition-transform"> LET'S PROTECT THE HOUSE! </button>
+            <button id="checkout-btn" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-2 md:py-4 rounded-lg text-xs md:text-base lg:text-lg shadow-lg transition-transform"> LET'S PROTECT THE HOUSE! </button>
           </div>
         </div>
       </div>
@@ -243,6 +243,7 @@
             <div id="disaster-indicator" class="px-3 py-1 rounded bg-orange-500/20 border border-orange-500/50 flex items-center">
               <span class="text-orange-400 font-bold text-sm" id="current-disaster-display">🌪️ TORNADO</span>
             </div>
+            <button id="ready-btn" class="hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 md:px-3 py-1 rounded border border-red-400 font-bold text-[10px] md:text-xs shadow-lg active:scale-95 transition-transform pulse-glow whitespace-nowrap cursor-pointer">I'M READY!</button>
             <div class="text-center bg-yellow-900/50 px-3 py-1 rounded border border-yellow-400 w-16">
               <p class="text-[10px] text-slate-400 font-bold uppercase leading-tight">Time</p>
               <p id="timer-display" class="font-title text-lg text-yellow-300 leading-tight">30</p>
@@ -539,6 +540,7 @@
       document.getElementById('disaster-indicator').className = 'px-3 py-1 rounded bg-yellow-500/20 border border-yellow-500 flex items-center';
       document.getElementById('current-disaster-display').className = 'text-yellow-400 font-bold text-sm pulse-glow';
       document.getElementById('current-disaster-display').textContent = '⚠️ PREP PHASE';
+      document.getElementById('ready-btn').classList.remove('hidden');
       
       let prepTime = 30;
       document.getElementById('timer-display').textContent = prepTime + 's';
@@ -556,6 +558,7 @@
     
     function startDisaster() {
       gameState.disasterActive = true;
+      document.getElementById('ready-btn').classList.add('hidden');
       document.getElementById('disaster-indicator').className = 'px-3 py-1 rounded bg-red-500/30 border border-red-500 flex items-center';
       document.getElementById('current-disaster-display').className = 'text-red-400 font-bold text-sm pulse-glow';
       document.getElementById('current-disaster-display').textContent = gameState.currentDisaster.name + ' HERE!';
@@ -1060,6 +1063,12 @@
     document.getElementById('how-to-play-btn').addEventListener('click', () => showScreen('how-to-play-screen'));
     document.getElementById('back-to-menu-btn').addEventListener('click', () => showScreen('menu-screen'));
     document.getElementById('checkout-btn').addEventListener('click', checkout);
+    document.getElementById('ready-btn').addEventListener('click', () => {
+        if (!gameState.disasterActive && gameState.screen === 'game-screen') {
+            clearInterval(gameState.gameInterval);
+            startDisaster();
+        }
+    });
 
     // Allows clicking anywhere on the house to walk there
     document.getElementById('house').addEventListener('click', (e) => {
