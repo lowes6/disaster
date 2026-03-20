@@ -1059,7 +1059,7 @@
     document.getElementById('start-menu-btn').addEventListener('click', startGame);
     document.getElementById('how-to-play-btn').addEventListener('click', () => showScreen('how-to-play-screen'));
     document.getElementById('back-to-menu-btn').addEventListener('click', () => showScreen('menu-screen'));
-    document.getElementById('checkout-btn').addEventListener('click', () => { if(shopMode === 'checkout') checkout() });
+    document.getElementById('checkout-btn').addEventListener('click', checkout);
 
     // Allows clicking anywhere on the house to walk there
     document.getElementById('house').addEventListener('click', (e) => {
