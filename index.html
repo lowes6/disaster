@@ -104,6 +104,7 @@
     <!-- Main Menu -->
     <div id="menu-screen" class="h-full hidden flex-col items-center justify-center p-4">
       <div class="text-center mb-8">
+        <p class="font-title text-xl md:text-2xl text-cyan-300 tracking-wider mb-1 drop-shadow-md">Letisha</p>
         <h1 id="title-display" class="font-title text-5xl md:text-6xl text-yellow-400 mb-2 drop-shadow-lg bounce-gentle"> DISASTERS SURVIVAL</h1>
         <p class="text-slate-300 text-lg max-w-md mx-auto mb-4">Get ready for adventure! Shop for cool supplies, build your home defenses, and save the day! </p>
         <div class="flex justify-center gap-4 text-4xl mb-4">
@@ -111,7 +112,7 @@
         </div>
       </div>
       <div class="flex flex-col gap-4 w-full max-w-sm mx-auto text-center">
-        <p class="text-cyan-300 mb-2 text-xs font-bold tracking-widest uppercase bg-slate-800 p-2 rounded-lg border border-slate-600">🎮 Makey Makey Ready</p>
+        <p class="text-cyan-300 mb-2 text-xs font-bold tracking-widest uppercase bg-slate-800 p-2 rounded-lg border border-slate-600">🎮 Makey Makey & Touch Ready</p>
         <button id="how-to-play-btn" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-title text-2xl px-8 py-3 rounded-xl shadow-lg transform transition-all ring-4 ring-yellow-300"> HOW TO PLAY </button>
         <button id="start-menu-btn" class="bg-gradient-to-r from-green-400 to-emerald-500 text-white font-title text-3xl px-12 py-3 rounded-xl shadow-lg transform transition-all"> LET'S GO! </button>
       </div>
@@ -124,7 +125,7 @@
         <h1 class="font-title text-4xl text-yellow-400 drop-shadow-lg text-center flex-1">📖 HOW TO PLAY</h1>
       </div>
       
-      <p class="text-center text-cyan-300 font-bold bg-slate-800 p-2 rounded-lg border-2 border-slate-600 mb-4 shrink-0 text-sm">Use ONLY Arrow Keys ⬅️➡️⬆️⬇️ and Spacebar!</p>
+      <p class="text-center text-cyan-300 font-bold bg-slate-800 p-2 rounded-lg border-2 border-slate-600 mb-4 shrink-0 text-sm">Use ONLY Arrow Keys ⬅️➡️⬆️⬇️ and Spacebar! (Or tap the screen)</p>
       
       <div class="flex-1 grid grid-cols-3 gap-4 min-h-0">
         <!-- Phase 1 -->
@@ -191,7 +192,7 @@
         <div class="w-2/3 bg-blue-900/60 rounded-xl p-2 border-2 border-cyan-500 flex flex-col min-h-0">
           <div class="flex justify-between items-center mb-1 shrink-0">
              <h3 class="font-title text-base text-cyan-300">📦 PICK YOUR GEAR</h3>
-             <p class="text-[9px] font-bold text-cyan-200">ARROWS move | SPACE buy</p>
+             <p class="text-[9px] font-bold text-cyan-200">ARROWS move | SPACE buy (or Click)</p>
           </div>
           <div id="shop-items" class="grid grid-cols-4 grid-rows-3 gap-2 flex-1 min-h-0">
             <!-- Items populated by JS -->
@@ -203,7 +204,7 @@
           <div class="flex justify-between items-center mb-1 shrink-0">
              <h3 class="font-title text-base text-green-300">🎒 BAG <span class="text-[10px] text-green-200">(Max 10)</span></h3>
           </div>
-          <p class="text-[9px] font-bold text-green-200 mb-1 shrink-0 text-center">ARROWS move | SPACE remove</p>
+          <p class="text-[9px] font-bold text-green-200 mb-1 shrink-0 text-center">ARROWS move | SPACE remove (or Click)</p>
           <div id="cart-items" class="grid grid-cols-2 grid-rows-5 gap-2 flex-1 min-h-0">
             <!-- Cart items populated by JS -->
           </div>
@@ -218,7 +219,7 @@
     </div>
 
     <!-- Game Screen -->
-    <div id="game-screen" class="h-full hidden flex-col">
+    <div id="game-screen" class="h-full hidden flex-col relative">
       <!-- HUD -->
       <div class="bg-slate-900/95 p-2 border-b-2 border-slate-700 shrink-0">
         <div class="flex justify-between items-center gap-2">
@@ -304,6 +305,21 @@
             <p>🔄 <span class="text-yellow-300">SPACE (empty)</span>: Cycle Bag | ❤️ <span class="text-red-300">HOLD SPACE</span>: Heal</p>
           </div>
         </div>
+
+        <!-- Virtual Controls (Touch/Mouse Overlay) -->
+        <div class="absolute bottom-16 left-4 z-50 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+          <button id="v-up" class="w-12 h-12 bg-slate-700/90 rounded-lg border-2 border-slate-400 flex items-center justify-center text-white active:bg-slate-500 touch-none select-none shadow-lg">▲</button>
+          <div class="flex gap-1">
+            <button id="v-left" class="w-12 h-12 bg-slate-700/90 rounded-lg border-2 border-slate-400 flex items-center justify-center text-white active:bg-slate-500 touch-none select-none shadow-lg">◀</button>
+            <button id="v-down" class="w-12 h-12 bg-slate-700/90 rounded-lg border-2 border-slate-400 flex items-center justify-center text-white active:bg-slate-500 touch-none select-none shadow-lg">▼</button>
+            <button id="v-right" class="w-12 h-12 bg-slate-700/90 rounded-lg border-2 border-slate-400 flex items-center justify-center text-white active:bg-slate-500 touch-none select-none shadow-lg">▶</button>
+          </div>
+        </div>
+        
+        <div class="absolute bottom-16 right-4 z-50 opacity-60 hover:opacity-100 transition-opacity">
+          <button id="v-space" class="w-20 h-20 bg-yellow-600/90 rounded-full border-4 border-yellow-400 flex items-center justify-center text-white font-title text-sm shadow-[0_0_15px_rgba(250,204,21,0.5)] active:scale-95 touch-none select-none shadow-lg">ACTION</button>
+        </div>
+
       </div>
 
       <!-- Inventory Bar -->
@@ -420,13 +436,17 @@
         const isSelected = gameState.shopSelectedIndex === index;
         const div = document.createElement('div');
         
-        // Ensure flex layout stretches the item nicely across the box
-        div.className = `item-slot p-1 flex flex-col items-center justify-center rounded-lg border-2 bg-slate-800/80 w-full h-full ${isSelected && shopMode === 'items' ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 shadow-xl z-10' : (canAfford ? 'border-slate-600' : 'border-slate-700 opacity-40')}`;
+        div.className = `item-slot p-1 flex flex-col items-center justify-center rounded-lg border-2 bg-slate-800/80 w-full h-full cursor-pointer ${isSelected && shopMode === 'items' ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 shadow-xl z-10' : (canAfford ? 'border-slate-600 hover:border-cyan-400' : 'border-slate-700 opacity-40')}`;
         div.innerHTML = `
-          <div class="text-4xl md:text-5xl lg:text-6xl leading-none flex-1 flex items-center justify-center drop-shadow-md w-full">${item.icon}</div>
-          <p class="text-xs md:text-sm text-slate-300 text-center font-bold leading-tight px-1 line-clamp-1 w-full shrink-0 mt-1">${item.name}</p>
-          <p class="text-xs md:text-sm font-bold mt-1 shrink-0 ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
+          <div class="text-4xl md:text-5xl lg:text-6xl leading-none flex-1 flex items-center justify-center drop-shadow-md w-full pointer-events-none">${item.icon}</div>
+          <p class="text-xs md:text-sm text-slate-300 text-center font-bold leading-tight px-1 line-clamp-1 w-full shrink-0 mt-1 pointer-events-none">${item.name}</p>
+          <p class="text-xs md:text-sm font-bold mt-1 shrink-0 pointer-events-none ${canAfford ? 'text-green-400' : 'text-red-400'}">$${item.price}</p>
         `;
+        div.onclick = () => {
+          gameState.shopSelectedIndex = index;
+          shopMode = 'items';
+          addToCart(id);
+        };
         shopContainer.appendChild(div);
       });
       
@@ -473,11 +493,16 @@
         total += item.price;
         const isSelected = gameState.cartSelectedIndex === index && shopMode === 'cart';
         const div = document.createElement('div');
-        div.className = `bg-slate-700 flex flex-col items-center justify-center p-1 rounded border shadow-inner w-full h-full ${isSelected ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 z-10' : 'border-slate-500'}`;
+        div.className = `bg-slate-700 flex flex-col items-center justify-center p-1 rounded border shadow-inner w-full h-full cursor-pointer ${isSelected ? 'border-yellow-300 ring-2 ring-yellow-300 scale-105 z-10' : 'border-slate-500 hover:border-red-400'}`;
         div.innerHTML = `
-          <div class="text-3xl md:text-4xl lg:text-5xl leading-none flex-1 flex items-center justify-center drop-shadow-md w-full">${item.icon}</div>
-          <div class="text-[10px] md:text-xs truncate w-full text-center px-1 font-bold text-slate-300 shrink-0 mt-1">${item.name}</div>
+          <div class="text-3xl md:text-4xl lg:text-5xl leading-none flex-1 flex items-center justify-center drop-shadow-md w-full pointer-events-none">${item.icon}</div>
+          <div class="text-[10px] md:text-xs truncate w-full text-center px-1 font-bold text-slate-300 shrink-0 mt-1 pointer-events-none">${item.name}</div>
         `;
+        div.onclick = () => {
+          gameState.cartSelectedIndex = index;
+          shopMode = 'cart';
+          removeFromCart();
+        };
         cartContainer.appendChild(div);
       });
       
@@ -701,10 +726,13 @@
         const div = document.createElement('div');
         div.className = `h-full flex-1 rounded border-2 flex items-center justify-center ${
           gameState.selectedSlot === i ? 'border-yellow-300 bg-gradient-to-br from-yellow-600 to-yellow-700' :
-          (item ? 'border-slate-500 bg-slate-700' : 'border-slate-600 bg-slate-800/50')
+          (item ? 'border-slate-500 bg-slate-700 cursor-pointer' : 'border-slate-600 bg-slate-800/50')
         }`;
         
         div.innerHTML = `<div class="text-2xl md:text-3xl">${item ? item.icon : ' '}</div>`;
+        if (item) {
+            div.onclick = () => cycleInventoryTo(i);
+        }
         container.appendChild(div);
       }
     }
@@ -770,12 +798,21 @@
           const rect = zoneEl.getBoundingClientRect();
           const houseRect = document.getElementById('house').getBoundingClientRect();
           const div = document.createElement('div');
-          div.className = 'placed-item-badge absolute flex flex-col items-center justify-center rounded font-bold text-xs pointer-events-auto';
+          div.className = 'placed-item-badge absolute flex flex-col items-center justify-center rounded font-bold text-xs pointer-events-auto cursor-pointer';
           div.style.left = `${((rect.left - houseRect.left) / houseRect.width) * 100}%`;
           div.style.top = `${((rect.top - houseRect.top) / houseRect.height) * 100}%`;
           div.style.width = `${(rect.width / houseRect.width) * 100}%`;
           div.style.height = `${(rect.height / houseRect.height) * 100}%`;
-          div.innerHTML = `<div class="text-3xl md:text-4xl">${item.icon}</div>`;
+          div.innerHTML = `<div class="text-3xl md:text-4xl pointer-events-none">${item.icon}</div>`;
+          
+          // Allow clicking placed items directly to pick them up
+          div.onclick = () => {
+             // move player to item location
+             gameState.playerPos.x = ((rect.left - houseRect.left + rect.width / 2) / houseRect.width) * 100;
+             gameState.playerPos.y = ((rect.top - houseRect.top + rect.height / 2) / houseRect.height) * 100;
+             updatePlayerPosition();
+             handleShortSpacePress();
+          };
           container.appendChild(div);
         }
       });
@@ -866,10 +903,69 @@
         }
     }
     
-    // --- KEYBOARD CONTROLLERS (RESTRICTED TO 5 BUTTONS) ---
+    // --- KEYBOARD & VIRTUAL CONTROLLERS ---
     const keysPressed = {};
     let spaceIsHeld = false;
     let spaceHoldInterval = null;
+
+    // Handle Virtual Buttons
+    function bindVirtualKey(btnId, keyName) {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        
+        const press = (e) => {
+            e.preventDefault();
+            keysPressed[keyName] = true;
+        };
+        const release = (e) => {
+            e.preventDefault();
+            keysPressed[keyName] = false;
+        };
+        
+        btn.addEventListener('mousedown', press);
+        btn.addEventListener('touchstart', press, {passive: false});
+        
+        btn.addEventListener('mouseup', release);
+        btn.addEventListener('mouseleave', release);
+        btn.addEventListener('touchend', release, {passive: false});
+        btn.addEventListener('touchcancel', release, {passive: false});
+    }
+
+    bindVirtualKey('v-up', 'arrowup');
+    bindVirtualKey('v-down', 'arrowdown');
+    bindVirtualKey('v-left', 'arrowleft');
+    bindVirtualKey('v-right', 'arrowright');
+
+    const vSpace = document.getElementById('v-space');
+    if (vSpace) {
+        const spacePress = (e) => {
+            e.preventDefault();
+            if (!spaceIsHeld) {
+              spaceIsHeld = true;
+              spaceHoldInterval = setTimeout(() => {
+                  if (spaceIsHeld && gameState.holdingItem && ['waterJugs', 'foodKit', 'firstAid'].includes(gameState.holdingItem.id)) {
+                      useHeldItem();
+                      spaceIsHeld = false;
+                  }
+              }, 800);
+          }
+        };
+        const spaceRelease = (e) => {
+            e.preventDefault();
+            clearTimeout(spaceHoldInterval);
+            if (spaceIsHeld) {
+                handleShortSpacePress();
+                spaceIsHeld = false;
+            }
+        };
+
+        vSpace.addEventListener('mousedown', spacePress);
+        vSpace.addEventListener('touchstart', spacePress, {passive: false});
+        vSpace.addEventListener('mouseup', spaceRelease);
+        vSpace.addEventListener('mouseleave', spaceRelease);
+        vSpace.addEventListener('touchend', spaceRelease, {passive: false});
+        vSpace.addEventListener('touchcancel', spaceRelease, {passive: false});
+    }
     
     document.addEventListener('keydown', (e) => {
       if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) return;
@@ -959,6 +1055,37 @@
       }
     });
     
+    // Mouse click fallbacks
+    document.getElementById('start-menu-btn').addEventListener('click', startGame);
+    document.getElementById('how-to-play-btn').addEventListener('click', () => showScreen('how-to-play-screen'));
+    document.getElementById('back-to-menu-btn').addEventListener('click', () => showScreen('menu-screen'));
+    document.getElementById('checkout-btn').addEventListener('click', () => { if(shopMode === 'checkout') checkout() });
+
+    // Allows clicking anywhere on the house to walk there
+    document.getElementById('house').addEventListener('click', (e) => {
+      if (e.target.closest('.placed-item-badge') || e.target.closest('.placement-zone')) return;
+      
+      const houseRect = document.getElementById('house').getBoundingClientRect();
+      const clickX = ((e.clientX - houseRect.left) / houseRect.width) * 100;
+      const clickY = ((e.clientY - houseRect.top) / houseRect.height) * 100;
+      
+      gameState.playerPos.x = Math.max(5, Math.min(95, clickX));
+      gameState.playerPos.y = Math.max(5, Math.min(95, clickY));
+      updatePlayerPosition();
+    });
+
+    // Allows clicking zones directly to place/pickup
+    document.querySelectorAll('.placement-zone').forEach(zone => {
+      zone.addEventListener('click', (e) => {
+        const rect = zone.getBoundingClientRect();
+        const houseRect = document.getElementById('house').getBoundingClientRect();
+        gameState.playerPos.x = ((rect.left - houseRect.left + rect.width / 2) / houseRect.width) * 100;
+        gameState.playerPos.y = ((rect.top - houseRect.top + rect.height / 2) / houseRect.height) * 100;
+        updatePlayerPosition();
+        handleShortSpacePress();
+      });
+    });
+
     // Core Game Movement Loop
     function gameLoop() {
       if (gameState.screen === 'game-screen') {
